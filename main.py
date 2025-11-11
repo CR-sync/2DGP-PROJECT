@@ -9,10 +9,15 @@ LuciaSprite={
     "IDLE":[{"x":0, "y":167, "w":40, "h":230},
             {"x":40, "y":167, "w":77, "h":230},
             {"x":77, "y":167, "w":110, "h":230}],
-}
 
-# python
-CANVAS_W, CANVAS_H = 1200, 700
+    "walk":[{"x":0, "y":229, "w":35, "h":297},
+            {"x":35, "y":229, "w":66, "h":297},
+            {"x":66, "y":229, "w":90, "h":297},
+            {"x":90, "y":229, "w":127, "h":297},
+            {"x":127, "y":229, "w":155, "h":297},
+            {"x":155, "y":229, "w":185, "h":297},
+            {"x":185, "y":229, "w":218, "h":297}],
+}
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
     f = LuciaSprite[action][i]
@@ -34,7 +39,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["IDLE"])
+frame_count = len(LuciaSprite["walk"])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
@@ -44,7 +49,7 @@ while running:
         clear_canvas()
         background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
 
-        draw_action("IDLE", frame, x=130, y=230, scale=7.0)
+        draw_action("walk", frame, x=130, y=230, scale=7.0)
 
         update_canvas()
         delay(delay_time)
