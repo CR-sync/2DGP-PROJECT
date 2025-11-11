@@ -38,5 +38,11 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-delay(5)
+frame_count = len(LuciaSprite["IDLE"])
+fps = 8.0
+delay_time = 1.0 / fps
+running = True
+frame = 0
+
+
 close_canvas()
