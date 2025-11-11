@@ -25,6 +25,13 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
     src_x2 = f["w"]
     src_y2 = f["h"]
 
+    src_w = src_x2 - src_x1
+    src_h = src_y2 - src_y1
+
+    #화면 아래쪽이 기준이므로 변환
+    src_bottom = character.h - src_y2
+
+
 
 delay(5)
 close_canvas()
