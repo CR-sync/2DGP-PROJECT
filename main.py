@@ -41,8 +41,18 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 frame_count = len(LuciaSprite["IDLE"])
 fps = 8.0
 delay_time = 1.0 / fps
-running = True
 frame = 0
+
+while running:
+        clear_canvas()
+        background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
+
+        draw_action("IDLE", frame, x=130, y=230, scale=7.0)
+
+        update_canvas()
+        delay(delay_time)
+
+        frame = (frame + 1) % frame_count
 
 
 close_canvas()
