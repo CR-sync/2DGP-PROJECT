@@ -31,7 +31,12 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
     #화면 아래쪽이 기준이므로 변환
     src_bottom = character.h - src_y2
 
+    dst_w = int(src_w * scale)
+    dst_h = int(src_h * scale)
 
+    draw_x, draw_y = x, y
+
+    character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
 delay(5)
 close_canvas()
