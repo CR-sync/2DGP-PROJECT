@@ -4,6 +4,8 @@ open_canvas(1200,700)
 
 background = load_image('background.png')
 character = load_image('LuciaSprite.png')
+HP_bar_down = load_image('font.png')
+HP_bar_up = load_image('font.png')
 
 LuciaSprite={
     "IDLE":[{"x":0, "y":167, "w":40, "h":230},
@@ -48,6 +50,9 @@ frame = 0
 while running:
         clear_canvas()
         background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
+
+        HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
+        HP_bar_up.clip_draw(13, HP_bar_up.h-31, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
 
         draw_action("walk", frame, x=130, y=230, scale=7.0)
 
