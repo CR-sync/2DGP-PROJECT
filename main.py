@@ -37,6 +37,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 frame_count = len(LuciaSprite["IDLE"])
 fps = 8.0
 delay_time = 1.0 / fps
+running = True
 frame = 0
 
 while running:
