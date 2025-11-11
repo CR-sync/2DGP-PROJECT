@@ -15,7 +15,16 @@ LuciaSprite={
             {"x":77, "y":167, "w":110, "h":230}],
 }
 
-update_canvas()
+# python
+CANVAS_W, CANVAS_H = 1200, 700
+
+def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
+    f = LuciaSprite[action][i]
+    src_x1 = f["x"]
+    src_y1 = f["y"]
+    src_x2 = f["w"]
+    src_y2 = f["h"]
+
 
 delay(5)
 close_canvas()
