@@ -22,7 +22,12 @@ LuciaSprite={
 
     "sit": [{"x":254, "y":258, "w":287, "h":300}],
 
-    "jump": [],
+    "jump": [{"x":124, "y":300, "w":174, "h":350},
+             {"x":174, "y":300, "w":209, "h":350},
+             {"x":209, "y":300, "w":260, "h":350},
+             {"x":260, "y":300, "w":297, "h":350}],
+
+    "jump_kick": [{"x":322, "y":300, "w":375, "h":359}],
 
     "kick": [{"x":0, "y":389, "w":40, "h":455},
              {"x":40, "y":389, "w":89, "h":455},
@@ -68,7 +73,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["kick_combo2"])
+frame_count = len(LuciaSprite["jump_kick"])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
@@ -84,7 +89,7 @@ while running:
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
-        draw_action("kick_combo2", frame, x=130, y=230, scale=7.0)
+        draw_action("jump_kick", frame, x=130, y=230, scale=7.0)
 
         update_canvas()
         delay(delay_time)
