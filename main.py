@@ -28,6 +28,9 @@ LuciaSprite={
              {"x":40, "y":389, "w":89, "h":455},
              {"x":89, "y":389, "w":151, "h":455}],
 
+    "kick_combo1" : [{"x":170, "y":390, "w":222, "h":457},
+                     {"x":222, "y":390, "w":278, "h":457}],
+
     "Dash" : [],
 
     "spinKick" : [],
@@ -61,7 +64,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["kick"])
+frame_count = len(LuciaSprite["kick_combo1"])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
@@ -77,7 +80,7 @@ while running:
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
-        draw_action("kick", frame, x=130, y=230, scale=7.0)
+        draw_action("kick_combo1", frame, x=130, y=230, scale=7.0)
 
         update_canvas()
         delay(delay_time)
