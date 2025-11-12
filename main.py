@@ -19,6 +19,7 @@ LuciaSprite={
             {"x":127, "y":229, "w":155, "h":297},
             {"x":155, "y":229, "w":185, "h":297},
             {"x":185, "y":229, "w":218, "h":297}],
+
 }
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
@@ -51,8 +52,11 @@ while running:
         clear_canvas()
         background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
 
+        x1, y1 = 13, 15  # 시작 좌표     x키워서 player1 체력바 줄이기
+        x2, y2 = 342, 31  # 끝 좌표     x줄여서 player2 체력바 줄이기
+
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
-        HP_bar_up.clip_draw(13, HP_bar_up.h-31, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
+        HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
         draw_action("walk", frame, x=130, y=230, scale=7.0)
 
