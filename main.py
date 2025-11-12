@@ -20,6 +20,23 @@ LuciaSprite={
             {"x":155, "y":229, "w":185, "h":297},
             {"x":185, "y":229, "w":218, "h":297}],
 
+    "sit": [],
+
+    "jump": [],
+
+    "attack": [],
+
+    "Dash" : [],
+
+    "spinKick" : [],
+
+    "Combo" : [],
+
+    "Kdown" : [],
+
+    "Down" : [],
+
+    "getUp" : [],
 }
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
