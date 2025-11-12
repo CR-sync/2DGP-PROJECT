@@ -63,14 +63,13 @@ LuciaSprite={
                         {"x":312, "y":655, "w":398, "h":720},
                         {"x":398, "y":661, "w":478, "h":720},],
 
+    "HitReaction" : [{"x":0, "y":747, "w":44, "h":812}],
 
-    "Combo" : [],
-
-    "Kdown" : [],
-
-    "Down" : [],
-
-    "getUp" : [],
+    "KDown" : [{"x":0, "y":747, "w":44, "h":812},
+               {"x":44, "y":775, "w": 115, "h":807},
+               {"x":115, "y":780, "w":195, "h":805}],
+    #KDown 이후에 일어나기 모션
+    "getUp" : [{"x":195, "y":775, "w":260, "h":805}],
 }
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
@@ -93,7 +92,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["spinKick_combo"])
+frame_count = len(LuciaSprite["KDown"])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
@@ -109,7 +108,7 @@ while running:
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
-        draw_action("spinKick_combo", frame, x=400, y=230, scale=7.0)
+        draw_action("KDown", frame, x=400, y=230, scale=7.0)
 
         update_canvas()
         delay(delay_time)
