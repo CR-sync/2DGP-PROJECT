@@ -83,13 +83,29 @@ class Idle:
         self.Lucia = Lucia
 
     def enter(self, e):
-        self.boy.dir = 0
+        self.Lucia.dir = 0
+        self.Lucia.state = getattr(self.Lucia, 'state', 'IDLE')
+        self.lucia.frame = 0
+
     def exit(self, e):
         pass
-    def do(self):
-        pass
+
+    def do(self, dt=1.0/60.0):
+        fps = getattr(self.lucia, 'fps', 8.0)
+        frame_time = 1.0 / fps
+
+        frames = len(self.lucia.sprites.get(self.lucia.state, []))
+        while self.lucia._tick >= frame_time:
+            self.lucia._tick -= frame_time
+            self.lucia.frame = (self.lucia.frame + 1) % frames
+
+        speed = getattr(self.lucia, 'speed', 300.0)
+        self.lucia.x += self.lucia.dir * speed * dt
+
     def draw(self):
-        pass
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 class Lucia:
     def __init__(self):
@@ -98,6 +114,14 @@ class Lucia:
         self.face_dir = 1
         self.dir = 0
         self.image = load_image('LuciaSprite.png')
+
+        self.draw_action = draw_action
+        self.sprites = sprites
+        self.scale = scale
+        self.fps = 8.0
+        self.speed = 300.0
+        self.state = 'IDLE'
+        self.alpha = 1.0
 
         self.IDLE = Idle(self)
 
@@ -108,4 +132,4 @@ class Lucia:
         self.state_machine.handle_state_event(('INPUT', event))
 
     def draw(self):
-        pass
+        self.state_machine.draw()
