@@ -81,7 +81,8 @@ left_just_pressed = False
 down_pressed = False
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 7.0, alpha: float = 1.0):
-    f = LuciaSprite[action][i]
+    frames = LuciaSprite.get(action, [])
+    f = frames[i % len(frames)]
     src_x1 = f["x"]
     src_y1 = f["y"]
     src_x2 = f["w"]
@@ -105,7 +106,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["IDLE"])
+frame_count = len(LuciaSprite[state])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
@@ -134,6 +135,7 @@ def handle_events():
                     LuciaX -= 40
             elif event.key==SDLK_DOWN:
                 down_pressed = True
+                LuciaY = 160
                 state = "sit"
 
 
@@ -144,6 +146,7 @@ def handle_events():
                 left_pressed = False
             elif event.key==SDLK_DOWN:
                 down_pressed= False
+                LuciaY = 230
                 state="IDLE"
 
 while running:
