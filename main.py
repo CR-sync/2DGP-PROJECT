@@ -72,6 +72,9 @@ LuciaSprite={
     "getUp" : [{"x":195, "y":775, "w":260, "h":805}],
 }
 
+right_pressed = False
+right_just_pressed = False
+
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 7.0, alpha: float = 1.0):
     f = LuciaSprite[action][i]
     src_x1 = f["x"]
@@ -116,7 +119,10 @@ def handle_events():
             if event.key==SDLK_ESCAPE:
                 running = False
             if event.key==SDLK_RIGHT:
-                right_pressed = True
+                if not right_pressed:
+                    right_pressed = True
+                    right_just_pressed = True
+                    LuciaX += 40
 
         elif event.type==SDL_KEYUP:
             if event.key==SDLK_RIGHT:
@@ -132,12 +138,13 @@ while running:
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
-        if right_pressed:
+        # 잔상
+        if right_just_pressed:
             draw_action("IDLE", frame, LuciaX, LuciaY, alpha=0.4)
         else:
             draw_action("IDLE", frame, LuciaX, LuciaY)
 
-        if right_pressed:
+        if right_just_pressed:
             LuciaX += 40
             draw_action("IDLE", frame, LuciaX, LuciaY)
 
