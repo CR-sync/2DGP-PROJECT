@@ -1,4 +1,5 @@
 from pico2d import *
+from Lucia import Lucia
 
 open_canvas(1200,700)
 
@@ -120,34 +121,35 @@ def handle_events():
     for event in events:
         if event.type==SDL_QUIT:
             running = False
-        elif event.type==SDL_KEYDOWN:
-            if event.key==SDLK_ESCAPE:
-                running = False
-            elif event.key==SDLK_RIGHT:
-                if not right_pressed:
-                    right_pressed = True
-                    right_just_pressed = True
-                    LuciaX += 40
-            elif event.key==SDLK_LEFT:
-                if not left_pressed:
-                    left_pressed = True
-                    left_just_pressed = True
-                    LuciaX -= 40
-            elif event.key==SDLK_DOWN:
-                down_pressed = True
-                LuciaY = 160
-                state = "sit"
+        elif event.type==SDL_KEYDOWN and event.key==SDLK_ESCAPE:
+            running = False
+        else:
+            Lucia.handle_event(event)
+            # elif event.key==SDLK_RIGHT:
+            #     if not right_pressed:
+            #         right_pressed = True
+            #         right_just_pressed = True
+            #         LuciaX += 40
+            # elif event.key==SDLK_LEFT:
+            #     if not left_pressed:
+            #         left_pressed = True
+            #         left_just_pressed = True
+            #         LuciaX -= 40
+            # elif event.key==SDLK_DOWN:
+            #     down_pressed = True
+            #     LuciaY = 160
+            #     state = "sit"
 
 
-        elif event.type==SDL_KEYUP:
-            if event.key==SDLK_RIGHT:
-                right_pressed = False
-            elif event.key==SDLK_LEFT:
-                left_pressed = False
-            elif event.key==SDLK_DOWN:
-                down_pressed= False
-                LuciaY = 230
-                state="IDLE"
+        # elif event.type==SDL_KEYUP:
+        #     if event.key==SDLK_RIGHT:
+        #         right_pressed = False
+        #     elif event.key==SDLK_LEFT:
+        #         left_pressed = False
+        #     elif event.key==SDLK_DOWN:
+        #         down_pressed= False
+        #         LuciaY = 230
+        #         state="IDLE"
 
 while running:
         clear_canvas()
