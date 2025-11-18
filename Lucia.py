@@ -78,6 +78,22 @@ def left_up(e):
 def Down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
 
+class Walk:
+    def __init__(self):
+        pass
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        pass
+
+    def draw(self):
+        pass
+
 class Idle:
     def __init__(self,lucia):
         self.lucia = lucia
@@ -90,7 +106,7 @@ class Idle:
     def exit(self, e):
         pass
 
-    def do(self, dt=1.0/60.0):
+    def do(self):
         frames = len(self.lucia.sprites.get(self.lucia.state, [])) or 1
         self.lucia.frame = (int(self.lucia.frame) + 1) % frames
 
