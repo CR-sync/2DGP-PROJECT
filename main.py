@@ -7,6 +7,8 @@ character = load_image('LuciaSprite.png')
 HP_bar_down = load_image('font.png')
 HP_bar_up = load_image('font.png')
 
+state="IDLE"
+
 LuciaSprite={
     "IDLE":[{"x":0, "y":167, "w":40, "h":230},
             {"x":40, "y":167, "w":77, "h":230},
@@ -76,6 +78,7 @@ right_pressed = False
 right_just_pressed = False
 left_pressed = False
 left_just_pressed = False
+down_pressed = False
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 7.0, alpha: float = 1.0):
     f = LuciaSprite[action][i]
@@ -111,7 +114,7 @@ frame = 0
 LuciaX, LuciaY = 300, 230
 
 def handle_events():
-    global running, LuciaX, LuciaY, right_pressed, right_just_pressed, left_pressed, left_just_pressed
+    global running, LuciaX, LuciaY, right_pressed, right_just_pressed, left_pressed, left_just_pressed, state, down_pressed
     events=get_events()
     for event in events:
         if event.type==SDL_QUIT:
@@ -119,22 +122,29 @@ def handle_events():
         elif event.type==SDL_KEYDOWN:
             if event.key==SDLK_ESCAPE:
                 running = False
-            if event.key==SDLK_RIGHT:
+            elif event.key==SDLK_RIGHT:
                 if not right_pressed:
                     right_pressed = True
                     right_just_pressed = True
                     LuciaX += 40
-            if event.key==SDLK_LEFT:
+            elif event.key==SDLK_LEFT:
                 if not left_pressed:
                     left_pressed = True
                     left_just_pressed = True
                     LuciaX -= 40
+            elif event.key==SDLK_DOWN:
+                down_pressed = True
+                state = "sit"
+
 
         elif event.type==SDL_KEYUP:
             if event.key==SDLK_RIGHT:
                 right_pressed = False
             elif event.key==SDLK_LEFT:
                 left_pressed = False
+            elif event.key==SDLK_DOWN:
+                down_pressed= False
+                state="IDLE"
 
 while running:
         clear_canvas()
@@ -155,7 +165,7 @@ while running:
             prev_x = LuciaX + 40
             draw_action("IDLE", frame, prev_x, LuciaY, alpha=0.5)
 
-        draw_action("IDLE", frame, LuciaX, LuciaY)
+        draw_action(state, frame, LuciaX, LuciaY)
 
         update_canvas()
 
