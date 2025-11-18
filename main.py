@@ -74,6 +74,8 @@ LuciaSprite={
 
 right_pressed = False
 right_just_pressed = False
+left_pressed = False
+left_just_pressed = False
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 7.0, alpha: float = 1.0):
     f = LuciaSprite[action][i]
@@ -105,12 +107,11 @@ fps = 8.0
 delay_time = 1.0 / fps
 running = True
 frame = 0
-right_pressed=False
 
 LuciaX, LuciaY = 300, 230
 
 def handle_events():
-    global running, LuciaX, LuciaY, right_pressed
+    global running, LuciaX, LuciaY, right_pressed, right_just_pressed, left_pressed, left_just_pressed
     events=get_events()
     for event in events:
         if event.type==SDL_QUIT:
@@ -123,10 +124,17 @@ def handle_events():
                     right_pressed = True
                     right_just_pressed = True
                     LuciaX += 40
+            if event.key==SDLK_LEFT:
+                if not left_pressed:
+                    left_pressed = True
+                    left_just_pressed = True
+                    LuciaX -= 40
 
         elif event.type==SDL_KEYUP:
             if event.key==SDLK_RIGHT:
                 right_pressed = False
+            elif event.key==SDLK_LEFT:
+                left_pressed = False
 
 while running:
         clear_canvas()
@@ -139,14 +147,15 @@ while running:
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
         # 잔상
-        if right_just_pressed:
-            draw_action("IDLE", frame, LuciaX, LuciaY, alpha=0.4)
-        else:
-            draw_action("IDLE", frame, LuciaX, LuciaY)
+        if right_pressed:
+            prev_x = LuciaX - 40
+            draw_action("IDLE", frame, prev_x, LuciaY, alpha=0.5)
 
-        if right_just_pressed:
-            LuciaX += 40
-            draw_action("IDLE", frame, LuciaX, LuciaY)
+        if left_pressed:
+            prev_x = LuciaX + 40
+            draw_action("IDLE", frame, prev_x, LuciaY, alpha=0.5)
+
+        draw_action("IDLE", frame, LuciaX, LuciaY)
 
         update_canvas()
 
