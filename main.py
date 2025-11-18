@@ -97,11 +97,12 @@ fps = 8.0
 delay_time = 1.0 / fps
 running = True
 frame = 0
+right_pressed=False
 
 LuciaX, LuciaY = 300, 230
 
 def handle_events():
-    global running, LuciaX, LuciaY
+    global running, LuciaX, LuciaY, right_pressed
     events=get_events()
     for event in events:
         if event.type==SDL_QUIT:
@@ -110,7 +111,11 @@ def handle_events():
             if event.key==SDLK_ESCAPE:
                 running = False
             if event.key==SDLK_RIGHT:
-                LuciaX+=10
+                right_pressed = True
+
+        elif event.type==SDL_KEYUP:
+            if event.key==SDLK_RIGHT:
+                right_pressed = False
 
 while running:
         clear_canvas()
@@ -123,6 +128,10 @@ while running:
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
         draw_action("IDLE", frame, LuciaX, LuciaY)
+
+        if right_pressed:
+            LuciaX += 40
+            draw_action("IDLE", frame, LuciaX, LuciaY)
 
         update_canvas()
 
