@@ -13,6 +13,18 @@ def left_up(e):
 def Down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
 
+class Idle:
+    def __init__(self):
+        pass
+    def enter(self, e):
+        pass
+    def exit(self, e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
+
 class Lucia:
     def __init__(self):
         self.x, self.y = 300, 230
@@ -21,9 +33,7 @@ class Lucia:
         self.dir = 0
         self.image = load_image('LuciaSprite.png')
 
-        self.state_machine = StateMachine(
-
-        )
+        self.IDLE = Idle(self)
 
     def update(self):
         pass
