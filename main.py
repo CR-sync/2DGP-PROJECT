@@ -54,37 +54,12 @@ def handle_events():
             running = False
         else:
             lucia.handle_event(event)
-            # elif event.key==SDLK_RIGHT:
-            #     if not right_pressed:
-            #         right_pressed = True
-            #         right_just_pressed = True
-            #         LuciaX += 40
-            # elif event.key==SDLK_LEFT:
-            #     if not left_pressed:
-            #         left_pressed = True
-            #         left_just_pressed = True
-            #         LuciaX -= 40
-            # elif event.key==SDLK_DOWN:
-            #     down_pressed = True
-            #     LuciaY = 160
-            #     state = "sit"
-
-
-        # elif event.type==SDL_KEYUP:
-        #     if event.key==SDLK_RIGHT:
-        #         right_pressed = False
-        #     elif event.key==SDLK_LEFT:
-        #         left_pressed = False
-        #     elif event.key==SDLK_DOWN:
-        #         down_pressed= False
-        #         LuciaY = 230
-        #         state="IDLE"
-
+            
 lucia = Lucia()
 LuciaX, LuciaY = lucia.x, lucia.y
 frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
-delay_time = 0.05
+delay_time = 0.14
 lucia.draw_action = draw_action
 
 while running:
