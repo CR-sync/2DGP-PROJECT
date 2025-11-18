@@ -72,7 +72,7 @@ LuciaSprite={
     "getUp" : [{"x":195, "y":775, "w":260, "h":805}],
 }
 
-def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 1.0):
+def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 7.0):
     f = LuciaSprite[action][i]
     src_x1 = f["x"]
     src_y1 = f["y"]
@@ -92,20 +92,25 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite["KDown"])
+frame_count = len(LuciaSprite["IDLE"])
 fps = 8.0
 delay_time = 1.0 / fps
 running = True
 frame = 0
 
+LuciaX, LuciaY = 300, 230
+
 def handle_events():
-    global running
+    global running, LuciaX, LuciaY
     events=get_events()
     for event in events:
         if event.type==SDL_QUIT:
             running = False
-        elif event.type==SDL_KEYDOWN and event.key==SDLK_ESCAPE:
-            running = False
+        elif event.type==SDL_KEYDOWN:
+            if event.key==SDLK_ESCAPE:
+                running = False
+            if event.key==SDLK_RIGHT:
+                LuciaX+=10
 
 while running:
         clear_canvas()
@@ -117,7 +122,7 @@ while running:
         HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
         HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
 
-        draw_action("KDown", frame, x=400, y=230, scale=7.0)
+        draw_action("IDLE", frame, LuciaX, LuciaY)
 
         update_canvas()
 
