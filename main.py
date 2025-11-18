@@ -1,5 +1,5 @@
 from pico2d import *
-from Lucia import Lucia
+from Lucia import Lucia, LuciaSprite
 
 open_canvas(1200,700)
 
@@ -42,24 +42,18 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
-frame_count = len(LuciaSprite[state])
-fps = 8.0
-delay_time = 1.0 / fps
 running = True
-frame = 0
-
-LuciaX, LuciaY = 300, 230
 
 def handle_events():
     global running, LuciaX, LuciaY, right_pressed, right_just_pressed, left_pressed, left_just_pressed, state, down_pressed
-    events=get_events()
+    events = get_events()
     for event in events:
-        if event.type==SDL_QUIT:
+        if event.type == SDL_QUIT:
             running = False
-        elif event.type==SDL_KEYDOWN and event.key==SDLK_ESCAPE:
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             running = False
         else:
-            Lucia.handle_event(event)
+            lucia.handle_event(event)
             # elif event.key==SDLK_RIGHT:
             #     if not right_pressed:
             #         right_pressed = True
@@ -86,34 +80,44 @@ def handle_events():
         #         LuciaY = 230
         #         state="IDLE"
 
+lucia = Lucia()
+LuciaX, LuciaY = lucia.x, lucia.y
+frame = 0
+frame_count = max(len(LuciaSprite.get(state, [])), 1)
+delay_time = 0.05
+lucia.draw_action = draw_action
+
 while running:
-        clear_canvas()
-        background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
+    clear_canvas()
+    background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
 
-        x1, y1 = 13, 15  # 시작 좌표     x키워서 player1 체력바 줄이기
-        x2, y2 = 342, 31  # 끝 좌표     x줄여서 player2 체력바 줄이기
+    x1, y1 = 13, 15
+    x2, y2 = 342, 31
 
-        HP_bar_down.clip_draw(13, HP_bar_down.h-15, 342-13, 31-15, 600, 550, (342-13)*3 , (31-15)*3 )
-        HP_bar_up.clip_draw(x1, HP_bar_up.h-y2, x2-x1, y2-y1, 600, 550, (x2-x1)*3 , (y2-y1)*3 )
+    HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
+    HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, x2 - x1, y2 - y1, 600, 550, (x2 - x1) * 3, (y2 - y1) * 3)
 
-        # 잔상
-        if right_pressed:
-            prev_x = LuciaX - 40
-            draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
-        elif left_pressed:
-            prev_x = LuciaX + 40
-            draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
+    #좌표 업데이트
+    LuciaX, LuciaY = lucia.x, lucia.y
 
-        draw_action(state, frame, LuciaX, LuciaY)
+    if right_pressed:
+        prev_x = LuciaX - 40
+        draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
+    elif left_pressed:
+        prev_x = LuciaX + 40
+        draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
 
-        update_canvas()
+    draw_action(state, frame, LuciaX, LuciaY)
 
-        handle_events()
-        if not running:
-            break
+    update_canvas()
 
-        frame = (frame + 1) % frame_count
-        delay(delay_time)
+    handle_events()
+    if not running:
+        break
 
+    frame_count = max(len(LuciaSprite.get(state, [])), 1)
+    frame = (frame + 1) % frame_count
+
+    delay(delay_time)
 
 close_canvas()

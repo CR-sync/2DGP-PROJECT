@@ -79,51 +79,49 @@ def Down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
 
 class Idle:
-    def __init__(self,Lucia):
-        self.Lucia = Lucia
+    def __init__(self,lucia):
+        self.lucia = lucia
 
     def enter(self, e):
-        self.Lucia.dir = 0
-        self.Lucia.state = getattr(self.Lucia, 'state', 'IDLE')
+        self.lucia.dir = 0
+        self.lucia.state = getattr(self.lucia, 'state', 'IDLE')
         self.lucia.frame = 0
 
     def exit(self, e):
         pass
 
     def do(self, dt=1.0/60.0):
-        fps = getattr(self.lucia, 'fps', 8.0)
-        frame_time = 1.0 / fps
-
-        frames = len(self.lucia.sprites.get(self.lucia.state, []))
-        while self.lucia._tick >= frame_time:
-            self.lucia._tick -= frame_time
-            self.lucia.frame = (self.lucia.frame + 1) % frames
-
-        speed = getattr(self.lucia, 'speed', 300.0)
-        self.lucia.x += self.lucia.dir * speed * dt
+        frames = len(self.lucia.sprites.get(self.lucia.state, [])) or 1
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames
 
     def draw(self):
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+        display_frame = int(getattr(self.lucia, 'frame', 0)) % frames_count
+
         draw_action = getattr(self.lucia, 'draw_action', None)
-        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+        draw_action(self.lucia.state, display_frame,x=self.lucia.x, y=self.lucia.y,
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 class Lucia:
     def __init__(self):
         self.x, self.y = 300, 230
         self.frame = 0
-        self.face_dir = 1
-        self.dir = 0
         self.image = load_image('LuciaSprite.png')
 
-        self.draw_action = draw_action
-        self.sprites = sprites
-        self.scale = scale
+        self.draw_action = globals().get('draw_action', None)
+        self.scale = globals().get('scale', 7.0)
         self.fps = 8.0
         self.speed = 300.0
         self.state = 'IDLE'
         self.alpha = 1.0
 
         self.IDLE = Idle(self)
+
+        rules = {
+            self.IDLE: {},
+        }
+        self.state_machine = StateMachine(self.IDLE, rules)
 
     def update(self):
         pass
