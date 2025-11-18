@@ -162,11 +162,10 @@ while running:
         # 잔상
         if right_pressed:
             prev_x = LuciaX - 40
-            draw_action("IDLE", frame, prev_x, LuciaY, alpha=0.5)
-
-        if left_pressed:
+            draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
+        elif left_pressed:
             prev_x = LuciaX + 40
-            draw_action("IDLE", frame, prev_x, LuciaY, alpha=0.5)
+            draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
 
         draw_action(state, frame, LuciaX, LuciaY)
 
