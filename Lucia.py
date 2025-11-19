@@ -90,6 +90,9 @@ class Walk:
         self.lucia.state = 'IDLE'
         self.lucia.frame = 0
 
+        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
+        self.lucia.x += self.lucia.dir * step
+
     def exit(self, e):
         pass
 
@@ -97,7 +100,6 @@ class Walk:
         frames = self.lucia.sprites.get(self.lucia.state, [])
         frames_count = len(frames)
         self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
-        self.lucia.x += self.lucia.dir * self.lucia.speed * (1.0 / self.lucia.fps)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
@@ -129,7 +131,9 @@ class Idle:
         frames = self.lucia.sprites.get(self.lucia.state, [])
         frames_count = len(frames)
         self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
-        self.lucia.x += self.lucia.dir * self.lucia.speed * (1.0 / self.lucia.fps)
+
+        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
+        self.lucia.x += self.lucia.dir * step
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
