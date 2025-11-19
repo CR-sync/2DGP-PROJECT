@@ -64,7 +64,7 @@ LuciaSprite={
 }
 
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN
+from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN
 from state_machine import StateMachine
 
 def right_down(e):
@@ -79,20 +79,32 @@ def Down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
 
 class Walk:
-    def __init__(self):
-        pass
+    def __init__(self, lucia):
+        self.lucia = lucia
 
     def enter(self, e):
-        pass
+        if right_down(e):
+            self.lucia.dir = 1
+        elif left_down(e):
+            self.lucia.dir = -1
+        self.lucia.state = 'IDLE'
 
     def exit(self, e):
         pass
 
     def do(self):
-        pass
+        frames = len(self.lucia.sprites.get(self.lucia.state, []))
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames
+        self.lucia.x += self.lucia.dir * self.lucia.speed * (1.0 / self.lucia.fps)
 
     def draw(self):
-        pass
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        if self.lucia.dir == 1:
+            draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+                        scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
+        else:
+            draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+                        scale=-self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 class Idle:
     def __init__(self,lucia):
@@ -107,16 +119,12 @@ class Idle:
         pass
 
     def do(self):
-        frames = len(self.lucia.sprites.get(self.lucia.state, [])) or 1
+        frames = self.lucia.sprites.get(self.lucia.state, [])
         self.lucia.frame = (int(self.lucia.frame) + 1) % frames
 
     def draw(self):
-        frames = self.lucia.sprites.get(self.lucia.state, [])
-        frames_count = len(frames)
-        display_frame = int(getattr(self.lucia, 'frame', 0)) % frames_count
-
         draw_action = getattr(self.lucia, 'draw_action', None)
-        draw_action(self.lucia.state, display_frame,x=self.lucia.x, y=self.lucia.y,
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 class Lucia:
@@ -125,22 +133,27 @@ class Lucia:
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
-        self.draw_action = globals().get('draw_action', None)
+        self.draw_action = None
         self.scale = globals().get('scale', 7.0)
         self.fps = 8.0
         self.speed = 300.0
         self.state = 'IDLE'
         self.alpha = 1.0
 
+        self.sprites = LuciaSprite
+        self.dir = 1
+
         self.IDLE = Idle(self)
+        self.WALK = Walk(self)
 
         rules = {
-            self.IDLE: {},
+            self.IDLE: {right_down: self.WALK, left_up: self.WALK},
+            self.WALK: {right_up: self.IDLE, left_up: self.IDLE}
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
     def update(self):
-        pass
+        self.state_machine.update()
 
     def handle_event(self, event):
         self.state_machine.handle_state_event(('INPUT', event))
