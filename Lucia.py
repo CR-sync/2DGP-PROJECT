@@ -140,6 +140,11 @@ class Idle:
         draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
+
+class Sit:
+    pass
+
+
 class Lucia:
     def __init__(self):
         self.x, self.y = 220, 190
@@ -158,10 +163,12 @@ class Lucia:
 
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
+        self.SIT=Sit(self)
 
         rules = {
-            self.IDLE: {right_down: self.WALK, left_down: self.WALK},
-            self.WALK: {right_up: self.IDLE, left_up: self.IDLE}
+            self.IDLE: {right_down: self.WALK, left_down: self.WALK, Down: self.SIT},
+            self.WALK: {right_up: self.IDLE, left_up: self.IDLE},
+            self.SIT: {right_down:self.WALK, left_down:self.WALK},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
