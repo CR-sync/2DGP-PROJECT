@@ -64,7 +64,7 @@ LuciaSprite={
 }
 
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN
+from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP
 from state_machine import StateMachine
 
 def right_down(e):
@@ -75,8 +75,10 @@ def left_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LEFT
 def left_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
-def Down(e):
+def bottom_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
+def bottom_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_DOWN
 
 class Walk:
     def __init__(self, lucia):
@@ -121,7 +123,7 @@ class Idle:
 
     def enter(self, e):
         self.lucia.dir = 0
-        self.lucia.state = getattr(self.lucia, 'state', 'IDLE')
+        self.lucia.state = 'IDLE'
         self.lucia.frame = 0
 
     def exit(self, e):
@@ -142,7 +144,26 @@ class Idle:
 
 
 class Sit:
-    pass
+    def __init__(self, lucia):
+        self.lucia = lucia
+
+    def enter(self, e):
+        self.lucia.dir = 0
+        self.lucia.state = 'sit'
+        self.lucia.frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
+
+    def draw(self):
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y-60,
+                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 
 class Lucia:
@@ -166,9 +187,9 @@ class Lucia:
         self.SIT=Sit(self)
 
         rules = {
-            self.IDLE: {right_down: self.WALK, left_down: self.WALK, Down: self.SIT},
+            self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT},
             self.WALK: {right_up: self.IDLE, left_up: self.IDLE},
-            self.SIT: {right_down:self.WALK, left_down:self.WALK},
+            self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
