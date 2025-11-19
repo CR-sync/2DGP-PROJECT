@@ -101,9 +101,18 @@ class Walk:
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
+
+        if self.lucia.dir==1:
+            prev_x = self.lucia.x - 40
+            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y, alpha=0.5)
+        else:
+            prev_x = self.lucia.x + 40
+            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y, alpha=0.5)
+
         draw_action(self.lucia.state, int(self.lucia.frame),
                     x=self.lucia.x, y=self.lucia.y,
                     scale=self.lucia.scale, alpha=self.lucia.alpha)
+
 class Idle:
     def __init__(self,lucia):
         self.lucia = lucia

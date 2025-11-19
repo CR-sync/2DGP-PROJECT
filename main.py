@@ -78,16 +78,6 @@ while running:
     HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
     HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, x2 - x1, y2 - y1, 600, 550, (x2 - x1) * 3, (y2 - y1) * 3)
 
-    #좌표 업데이트
-    LuciaX, LuciaY = lucia.x, lucia.y
-
-    if right_pressed:
-        prev_x = LuciaX - 40
-        draw_action(lucia.state, lucia.frame, prev_x, LuciaY, alpha=0.5)
-    elif left_pressed:
-        prev_x = LuciaX + 40
-        draw_action(lucia.state, lucia.frame, prev_x, LuciaY, alpha=0.5)
-
     lucia.draw()
 
     update_canvas()
