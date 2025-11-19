@@ -142,12 +142,12 @@ class Idle:
 
 class Lucia:
     def __init__(self):
-        self.x, self.y = 300, 230
+        self.x, self.y = 220, 190
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
         self.draw_action = None
-        self.scale = globals().get('scale', 7.0)
+        self.scale = globals().get('scale', 6.0)
         self.fps = 8.0
         self.speed = 300.0
         self.state = 'IDLE'
