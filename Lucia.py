@@ -88,24 +88,23 @@ class Walk:
         elif left_down(e):
             self.lucia.dir = -1
         self.lucia.state = 'IDLE'
+        self.lucia.frame = 0
 
     def exit(self, e):
         pass
 
     def do(self):
-        frames = len(self.lucia.sprites.get(self.lucia.state, []))
-        self.lucia.frame = (int(self.lucia.frame) + 1) % frames
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
         self.lucia.x += self.lucia.dir * self.lucia.speed * (1.0 / self.lucia.fps)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
-        if self.lucia.dir == 1:
-            draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
-                        scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
-        else:
-            draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
-                        scale=-self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
-
+        draw_action(self.lucia.state, int(self.lucia.frame),
+                    x=self.lucia.x, y=self.lucia.y,
+                    scale=(self.lucia.scale if self.lucia.dir >= 0 else -self.lucia.scale),
+                    alpha=self.lucia.alpha)
 class Idle:
     def __init__(self,lucia):
         self.lucia = lucia
@@ -120,7 +119,9 @@ class Idle:
 
     def do(self):
         frames = self.lucia.sprites.get(self.lucia.state, [])
-        self.lucia.frame = (int(self.lucia.frame) + 1) % frames
+        frames_count = len(frames)
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
+        self.lucia.x += self.lucia.dir * self.lucia.speed * (1.0 / self.lucia.fps)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
