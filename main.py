@@ -63,6 +63,12 @@ delay_time = 0.14
 lucia.draw_action = draw_action
 
 while running:
+    handle_events()
+    if not running:
+        break
+
+    lucia.update()
+
     clear_canvas()
     background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
 
@@ -77,21 +83,14 @@ while running:
 
     if right_pressed:
         prev_x = LuciaX - 40
-        draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
+        draw_action(lucia.state, lucia.frame, prev_x, LuciaY, alpha=0.5)
     elif left_pressed:
         prev_x = LuciaX + 40
-        draw_action(state, frame, prev_x, LuciaY, alpha=0.5)
+        draw_action(lucia.state, lucia.frame, prev_x, LuciaY, alpha=0.5)
 
-    draw_action(state, frame, LuciaX, LuciaY)
+    lucia.draw()
 
     update_canvas()
-
-    handle_events()
-    if not running:
-        break
-
-    frame_count = max(len(LuciaSprite.get(state, [])), 1)
-    frame = (frame + 1) % frame_count
 
     delay(delay_time)
 
