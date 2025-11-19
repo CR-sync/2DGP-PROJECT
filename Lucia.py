@@ -89,7 +89,13 @@ class Walk:
             self.lucia.dir = 1
         elif left_down(e):
             self.lucia.dir = -1
-        self.lucia.state = 'IDLE'
+
+        if getattr(self.lucia, 'down_pressed', False):
+            self.lucia.state = 'sit'
+            self.lucia.c= -60
+        else:
+            self.lucia.state = 'IDLE'
+
         self.lucia.frame = 0
 
         step = int(self.lucia.speed * (1.0 / self.lucia.fps))
@@ -108,13 +114,13 @@ class Walk:
 
         if self.lucia.dir==1:
             prev_x = self.lucia.x - 40
-            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y, alpha=0.5)
+            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y+self.lucia.c, alpha=0.5)
         else:
             prev_x = self.lucia.x + 40
-            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y, alpha=0.5)
+            draw_action(self.lucia.state, self.lucia.frame, prev_x, self.lucia.y+self.lucia.c, alpha=0.5)
 
         draw_action(self.lucia.state, int(self.lucia.frame),
-                    x=self.lucia.x, y=self.lucia.y,
+                    x=self.lucia.x, y=self.lucia.y+self.lucia.c,
                     scale=self.lucia.scale, alpha=self.lucia.alpha)
 
 class Idle:
@@ -151,9 +157,10 @@ class Sit:
         self.lucia.dir = 0
         self.lucia.state = 'sit'
         self.lucia.frame = 0
+        self.lucia.c = -60
 
     def exit(self, e):
-        pass
+        self.lucia.c = 0
 
     def do(self):
         frames = self.lucia.sprites.get(self.lucia.state, [])
@@ -162,7 +169,7 @@ class Sit:
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
-        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y-60,
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y+self.lucia.c,
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 
@@ -181,6 +188,7 @@ class Lucia:
 
         self.sprites = LuciaSprite
         self.dir = 1
+        self.down_pressed = False
 
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
@@ -197,6 +205,11 @@ class Lucia:
         self.state_machine.update()
 
     def handle_event(self, event):
+        if event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
+            self.down_pressed = True
+        elif event.type == SDL_KEYUP and event.key == SDLK_DOWN:
+            self.down_pressed = False
+
         self.state_machine.handle_state_event(('INPUT', event))
 
     def draw(self):
