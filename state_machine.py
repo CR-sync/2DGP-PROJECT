@@ -23,3 +23,22 @@ class StateMachine:
 
     def draw(self):
         self.cur_state.draw()
+
+    def change(self, next_state, state_event=('MANUAL', None)):
+        # 현재 상태에 exit 메서드가 있으면 호출
+        if hasattr(self.cur_state, 'exit') and callable(getattr(self.cur_state, 'exit')):
+            self.cur_state.exit(state_event)
+        else:
+            # 없으면 아무 작업도 하지 않음
+            pass
+        if hasattr(next_state, 'enter') and callable(getattr(next_state, 'enter')):
+            next_state.enter(state_event)
+        else:
+            pass
+        if hasattr(event_to_string, '__call__'):
+            ev_str = event_to_string(state_event)
+        else:
+            ev_str = str(state_event)
+
+        print(f'{self.cur_state.__class__.__name__} - {ev_str} -> {next_state.__class__.__name__}')
+        self.cur_state = next_state
