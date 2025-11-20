@@ -174,6 +174,19 @@ class Sit:
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 
+class Kick:
+    def __init__(self):
+        pass
+    def enter(self, e):
+        pass
+    def exit(self, e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
+
+
 class Lucia:
     def __init__(self):
         self.x, self.y = 220, 190
@@ -194,6 +207,7 @@ class Lucia:
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
         self.SIT=Sit(self)
+        self.KICK=Kick(self)
 
         def right_up_if_down(e):
             return right_up(e) and getattr(self, 'down_pressed', False)
@@ -212,6 +226,7 @@ class Lucia:
             self.WALK: {right_up_if_down: self.SIT, right_up_if_not_down: self.IDLE,
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
+            self.KICK:{},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
