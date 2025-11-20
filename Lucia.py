@@ -237,6 +237,36 @@ class Jump:
         draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y+200,
                     scale=5.5, alpha=getattr(self.lucia, 'alpha', 1.0))
 
+class JumpKick:
+    def __init__(self, lucia):
+        self.lucia = lucia
+
+    def enter(self, e):
+        self.lucia.state = 'jump_kick'
+        self.lucia.frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+
+        prev_frame = int(self.lucia.frame)
+        self.lucia.frame = (prev_frame + 1) % frames_count
+
+        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
+        self.lucia.x += self.lucia.dir * step
+
+        if prev_frame == frames_count - 1 and int(self.lucia.frame) == 0:
+            self.lucia.state_machine.change(self.lucia.IDLE)
+
+    def draw(self):
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        draw_action(self.lucia.state, int(self.lucia.frame),
+                    x=self.lucia.x, y=self.lucia.y,
+                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
+
 
 class Lucia:
     def __init__(self):
@@ -260,6 +290,7 @@ class Lucia:
         self.SIT=Sit(self)
         self.KICK=Kick(self)
         self.JUMP=Jump(self)
+        self.JUMP_KICK = JumpKick(self)
 
         def right_up_if_down(e):
             return right_up(e) and getattr(self, 'down_pressed', False)
@@ -279,7 +310,8 @@ class Lucia:
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
             self.KICK:{s_key_up:self.IDLE},
-            self.JUMP:{},
+            self.JUMP:{s_key_down: self.JUMP_KICK},
+            self.JUMP_KICK:{},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
