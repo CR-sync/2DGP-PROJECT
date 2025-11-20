@@ -240,26 +240,26 @@ class Jump:
 class JumpKick:
     def __init__(self, lucia):
         self.lucia = lucia
+        self._hold_frames=0
 
     def enter(self, e):
         self.lucia.state = 'jump_kick'
         self.lucia.frame = 0
+        HOLD_SECONDS = 0.4
+        self._hold_frames = int(self.lucia.fps * HOLD_SECONDS)
 
     def exit(self, e):
         pass
 
     def do(self):
-        frames = self.lucia.sprites.get(self.lucia.state, [])
-        frames_count = len(frames)
-
-        prev_frame = int(self.lucia.frame)
-        self.lucia.frame = (prev_frame + 1) % frames_count
-
         step = int(self.lucia.speed * (1.0 / self.lucia.fps))
         self.lucia.x += self.lucia.dir * step
 
-        if prev_frame == frames_count - 1 and int(self.lucia.frame) == 0:
-            self.lucia.state_machine.change(self.lucia.IDLE)
+        if self._hold_frames > 0:
+            self._hold_frames -= 1
+            return
+
+        self.lucia.state_machine.change(self.lucia.IDLE)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
