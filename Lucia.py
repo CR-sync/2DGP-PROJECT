@@ -222,10 +222,15 @@ class Jump:
     def do(self):
         frames = self.lucia.sprites.get(self.lucia.state, [])
         frames_count = len(frames)
+        prev_frame = int(self.lucia.frame)
+
         self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
 
         step = int(self.lucia.speed * (1.0 / self.lucia.fps))
         self.lucia.x += self.lucia.dir * step
+
+        if prev_frame == frames_count - 1 and int(self.lucia.frame) == 0:
+            self.lucia.state_machine.change(self.lucia.IDLE)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
@@ -274,7 +279,7 @@ class Lucia:
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
             self.KICK:{s_key_up:self.IDLE},
-            self.JUMP:{up_up:self.IDLE},
+            self.JUMP:{},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
