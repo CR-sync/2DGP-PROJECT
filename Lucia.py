@@ -102,7 +102,7 @@ class Walk:
         self.lucia.x += self.lucia.dir * step
 
     def exit(self, e):
-        pass
+        self.lucia.c = 0
 
     def do(self):
         frames = self.lucia.sprites.get(self.lucia.state, [])
@@ -131,6 +131,7 @@ class Idle:
         self.lucia.dir = 0
         self.lucia.state = 'IDLE'
         self.lucia.frame = 0
+        self.lucia.c=0
 
     def exit(self, e):
         pass
@@ -194,9 +195,22 @@ class Lucia:
         self.WALK = Walk(self)
         self.SIT=Sit(self)
 
+        def right_up_if_down(e):
+            return right_up(e) and getattr(self, 'down_pressed', False)
+
+        def right_up_if_not_down(e):
+            return right_up(e) and not getattr(self, 'down_pressed', False)
+
+        def left_up_if_down(e):
+            return left_up(e) and getattr(self, 'down_pressed', False)
+
+        def left_up_if_not_down(e):
+            return left_up(e) and not getattr(self, 'down_pressed', False)
+
         rules = {
             self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT},
-            self.WALK: {right_up: self.IDLE, left_up: self.IDLE},
+            self.WALK: {right_up_if_down: self.SIT, right_up_if_not_down: self.IDLE,
+                        left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
