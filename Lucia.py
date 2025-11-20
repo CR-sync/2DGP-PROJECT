@@ -64,7 +64,7 @@ LuciaSprite={
 }
 
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP
+from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP, SDLK_s
 from state_machine import StateMachine
 
 def right_down(e):
@@ -79,6 +79,10 @@ def bottom_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
 def bottom_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_DOWN
+def s_key_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
+def s_key_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
 
 class Walk:
     def __init__(self, lucia):
@@ -175,17 +179,28 @@ class Sit:
 
 
 class Kick:
-    def __init__(self):
-        pass
+    def __init__(self, lucia):
+        self.lucia = lucia
+
     def enter(self, e):
-        pass
+        self.lucia.state = 'kick'
+        self.lucia.frame = 0
+
     def exit(self, e):
         pass
-    def do(self):
-        pass
-    def draw(self):
-        pass
 
+    def do(self):
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
+
+        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
+        self.lucia.x += self.lucia.dir * step
+
+    def draw(self):
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 class Lucia:
     def __init__(self):
@@ -222,11 +237,11 @@ class Lucia:
             return left_up(e) and not getattr(self, 'down_pressed', False)
 
         rules = {
-            self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT},
+            self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT, s_key_down: self.KICK},
             self.WALK: {right_up_if_down: self.SIT, right_up_if_not_down: self.IDLE,
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
-            self.KICK:{},
+            self.KICK:{s_key_up:self.IDLE},
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
