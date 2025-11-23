@@ -313,6 +313,8 @@ class Lucia:
     def __init__(self):
         self.x, self.y = 220, 190
         self.base_y = self.y
+        self.facing = 1
+        self.is_backstep = False
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
