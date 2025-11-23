@@ -363,6 +363,11 @@ class Lucia:
         self.state_machine.update()
 
     def handle_event(self, event):
+        if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
+            self.last_input_dir = 1
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_LEFT:
+            self.last_input_dir = -1
+
         if event.type == SDL_KEYDOWN and event.key == SDLK_DOWN:
             self.down_pressed = True
         elif event.type == SDL_KEYUP and event.key == SDLK_DOWN:
