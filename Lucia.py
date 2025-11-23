@@ -66,6 +66,7 @@ LuciaSprite={
 from pico2d import load_image, get_time
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP, SDLK_s
 from state_machine import StateMachine
+import math
 
 def right_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
@@ -237,40 +238,81 @@ class Jump:
         draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y+200,
                     scale=5.5, alpha=getattr(self.lucia, 'alpha', 1.0))
 
+# python
 class JumpKick:
     def __init__(self, lucia):
         self.lucia = lucia
-        self._hold_frames=0
+        self._x0 = 0.0
+        self._y0 = 0.0
+        self._r = 0.0
+        self._updates = 0
+        self._left = 0
+        self._active = False
+        self._dir = 1
 
     def enter(self, e):
         self.lucia.state = 'jump_kick'
         self.lucia.frame = 0
-        HOLD_SECONDS = 0.4
-        self._hold_frames = int(self.lucia.fps * HOLD_SECONDS)
+
+        self._x0 = float(self.lucia.x)
+        self._y0 = float(self.lucia.y)
+
+        self._dir = self.lucia.dir or 1
+
+        base_y = getattr(self.lucia, 'base_y', self._y0)
+        self._r = max(1.0, base_y - self._y0)
+        if self._r <= 1.0:
+            self._r = 200.0
+
+        DURATION_SECONDS = 0.5
+        self._updates = max(1, int(self.lucia.fps * DURATION_SECONDS))
+        self._left = self._updates
+
+        self._active = True
 
     def exit(self, e):
-        pass
+        self._active = False
 
     def do(self):
-        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
-        self.lucia.x += self.lucia.dir * step
+        self._left -= 1
+        if self._left < 0:
+            self._left = 0
 
-        if self._hold_frames > 0:
-            self._hold_frames -= 1
-            return
+        done = (self._updates - self._left) / float(self._updates) if self._updates > 0 else 1.0
 
-        self.lucia.state_machine.change(self.lucia.IDLE)
+        theta = -math.pi / 2.0 + done * (math.pi / 2.0)
+
+        base_y = getattr(self.lucia, 'base_y', self._y0)
+        cy = base_y
+
+        x = self._x0 + self._dir * (self._r * math.cos(theta))
+
+        if base_y > self._y0:
+            y = cy + self._r * math.sin(theta)
+        else:
+            y = cy - self._r * math.sin(theta)
+
+        self.lucia.x = int(round(x))
+        self.lucia.y = int(round(y))
+
+        self.lucia.frame = 0
+
+        #끝조건
+        if self._left <= 0:
+            self.lucia.y = base_y
+            self.lucia.state_machine.change(self.lucia.IDLE)
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
         draw_action(self.lucia.state, int(self.lucia.frame),
-                    x=self.lucia.x, y=self.lucia.y,
-                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
+                        x=self.lucia.x, y=self.lucia.y,
+                        scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
 
 class Lucia:
     def __init__(self):
         self.x, self.y = 220, 190
+        self.base_y = self.y
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
