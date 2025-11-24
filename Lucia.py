@@ -530,3 +530,20 @@ class Lucia:
         right = int(self.x +x_off + half_w)
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
+    
+    def clamp_within_screen(self, screen_w=None):
+        if screen_w is None:
+            screen_w = globals().get('SCREEN_WIDTH', 1200)
+
+        if getattr(self, '_bb_template', None) is None:
+            self.update_bb_for_state()
+        try:
+            left, bottom, right, top = self.get_bb()
+        except Exception:
+            return
+
+        if left < 0:
+            self.x += -left
+
+        if right > screen_w:
+            self.x += (screen_w - right)
