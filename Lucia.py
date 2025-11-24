@@ -416,6 +416,17 @@ class Lucia:
             'kick_combo2': (80, 40, 30, 100)
         }
 
+        for st in (self.IDLE, self.WALK, self.SIT, self.KICK, self.KICK_COMBO1,
+                   self.KICK_COMBO2, self.JUMP, self.JUMP_KICK):
+            if hasattr(st, 'enter'):
+                orig_enter = st.enter
+                def make_wrapped(orig):
+                    def wrapped(e, orig=orig):
+                        orig(e)
+                        self.update_bb_for_state()
+                    return wrapped
+                st.enter = make_wrapped(orig_enter)
+
         def right_up_if_down(e):
             return right_up(e) and getattr(self, 'down_pressed', False)
 
