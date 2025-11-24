@@ -400,7 +400,7 @@ class Lucia:
             self.WALK: {right_up_if_down: self.SIT, right_up_if_not_down: self.IDLE,
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
-            self.KICK:{up_within_0_25: self.KICK_COMBO1, up_up:self.KICK},
+            self.KICK:{make_end_pred('KICK_END', 'UP', 'kick_at', 0.25, pre_window=0.12): self.KICK_COMBO1,kick_end: self.IDLE},
             self.KICK_COMBO1:{},
             self.JUMP:{s_key_down: self.JUMP_KICK},
             self.JUMP_KICK:{},
