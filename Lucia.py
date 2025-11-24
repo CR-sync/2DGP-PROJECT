@@ -244,6 +244,18 @@ class KickCombo1:
         draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
                     scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
 
+class KickCombo2:
+    def __init__(self, lucia):
+        pass
+    def enter(self, e):
+        pass
+    def exit(self, e):
+        pass
+    def do(self):
+        pass
+    def draw(self):
+        pass
+
 class Jump:
     def __init__(self, lucia):
         self.lucia = lucia
@@ -273,7 +285,6 @@ class Jump:
         draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y+200,
                     scale=5.5, alpha=getattr(self.lucia, 'alpha', 1.0))
 
-# python
 class JumpKick:
     def __init__(self, lucia):
         self.lucia = lucia
@@ -370,6 +381,7 @@ class Lucia:
         self.SIT=Sit(self)
         self.KICK=Kick(self)
         self.KICK_COMBO1=KickCombo1(self)
+        self.KICK_COMBO2=KickCombo2(self)
         self.JUMP=Jump(self)
         self.JUMP_KICK = JumpKick(self)
 
@@ -404,6 +416,7 @@ class Lucia:
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
             self.KICK:{make_end_pred('KICK_END', 'UP', 'kick_at', 0.25, pre_window=0.12): self.KICK_COMBO1,kick_end: self.IDLE},
             self.KICK_COMBO1:{},
+            self.KICK_COMBO2:{},
             self.JUMP:{s_key_down: self.JUMP_KICK},
             self.JUMP_KICK:{},
         }
