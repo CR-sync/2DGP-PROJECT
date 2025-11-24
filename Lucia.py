@@ -421,6 +421,12 @@ class Lucia:
         elif event.type == SDL_KEYUP and event.key == SDLK_DOWN:
             self.down_pressed = False
 
+        if event.type == SDL_KEYDOWN:
+            if getattr(event, 'key', None) == SDLK_UP:
+                self.combo.record_input('UP')
+            elif getattr(event, 'key', None) == SDLK_s:
+                self.combo.record_input('S')
+
         self.state_machine.handle_state_event(('INPUT', event))
 
     def draw(self):
