@@ -381,6 +381,17 @@ class Lucia:
         def up_within_0_25(e):
             return up_down(e) and (get_time() - getattr(self, 'kick_at', -9999) <= 0.25)
 
+        def make_end_pred(state_event_name, input_name, start_attr, window, pre_window=0.0):
+            def pred(e):
+                if e[0] != state_event_name:
+                    return False
+                end_time = get_time()
+                return self.combo.consume_if_within(input_name, end_time, window, pre_window)
+            return pred
+
+        def kick_end(e):
+            return e[0] == 'KICK_END'
+
 
         rules = {
             self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT, s_key_down: self.KICK, up_down: self.JUMP},
