@@ -415,6 +415,16 @@ class Lucia:
         def left_up_if_not_down(e):
             return left_up(e) and not getattr(self, 'down_pressed', False)
 
+        def make_start_pred(start_attr, input_name, window, pre_window=0.0):
+            def pred(e):
+                if e[0] != 'INPUT':
+                    return False
+                start_time = getattr(self, start_attr, None)
+                if start_time is None:
+                    return False
+                return self.combo.consume_if_within(input_name, start_time, window, pre_window)
+            return pred
+
         def make_end_pred(state_event_name, input_name, start_attr, window, pre_window=0.0):
             def pred(e):
                 if e[0] != state_event_name:
