@@ -496,4 +496,9 @@ class Lucia:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return self.x - 80, self.y - 180, self.x + 80, self.y + 180
+        half_w, half_h, y_off, x_off = self._bb_template
+        left = int(self.x + x_off - half_w)
+        bottom = int(self.y - half_h + y_off)
+        right = int(self.x +x_off + half_w)
+        top = int(self.y + half_h + y_off)
+        return left, bottom, right, top
