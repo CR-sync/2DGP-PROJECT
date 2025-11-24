@@ -426,6 +426,8 @@ class Lucia:
         def kick_end(e):
             return e[0] == 'KICK_END'
 
+        def kick_combo1_end(e):
+            return e[0] == 'KICKCOMBO1_END'
 
         rules = {
             self.IDLE: {right_down: self.WALK, left_down: self.WALK, bottom_down: self.SIT, s_key_down: self.KICK, up_down: self.JUMP},
