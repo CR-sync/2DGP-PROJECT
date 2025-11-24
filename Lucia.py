@@ -419,8 +419,10 @@ class Lucia:
             def pred(e):
                 if e[0] != state_event_name:
                     return False
-                end_time = get_time()
-                return self.combo.consume_if_within(input_name, end_time, window, pre_window)
+                start_time = getattr(self, start_attr, None)
+                if start_time is None:
+                    start_time = get_time()
+                return self.combo.consume_if_within(input_name, start_time, window, pre_window)
             return pred
 
         def kick_end(e):
