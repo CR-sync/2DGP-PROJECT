@@ -231,13 +231,13 @@ class KickCombo1:
         frames_count = len(frames)
         prev_frame = int(self.lucia.frame)
 
-        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
+        self.lucia.frame = (prev_frame + 1) % frames_count
 
         step = int(self.lucia.speed * (1.0 / self.lucia.fps))
         self.lucia.x += self.lucia.dir * step
 
         if prev_frame == frames_count - 1 and int(self.lucia.frame) == 0:
-            self.lucia.state_machine.change(self.lucia.IDLE)
+            self.lucia.state_machine.handle_state_event(('KICKCOMBO1_END', None))
 
     def draw(self):
         draw_action = getattr(self.lucia, 'draw_action', None)
