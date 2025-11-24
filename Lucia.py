@@ -191,6 +191,7 @@ class Kick:
     def enter(self, e):
         self.lucia.state = 'kick'
         self.lucia.frame = 0
+        self.lucia.kick_at = get_time()
 
     def exit(self, e):
         pass
