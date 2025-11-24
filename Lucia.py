@@ -379,7 +379,7 @@ class Lucia:
         self.base_y = self.y
         self.facing = 1
         self.is_backstep = False
-        self.combo = ComboManager(retention=2.0, time_func=get_time)
+        self.combo = ComboManager(retention=4.0, time_func=get_time)
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
@@ -446,8 +446,8 @@ class Lucia:
             self.WALK: {right_up_if_down: self.SIT, right_up_if_not_down: self.IDLE,
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
-            self.KICK:{make_end_pred('KICK_END', 'UP', 'kick_at', 0.25, pre_window=0.12): self.KICK_COMBO1,kick_end: self.IDLE},
-            self.KICK_COMBO1: {make_start_pred('kick_combo1_at', 'S', 0.25, pre_window=0.0): self.KICK_COMBO2,
+            self.KICK:{make_end_pred('KICK_END', 'UP', 'kick_at', 0.25, pre_window=0.4): self.KICK_COMBO1,kick_end: self.IDLE},
+            self.KICK_COMBO1: {make_start_pred('kick_combo1_at', 'S', 0.25, pre_window=0.4): self.KICK_COMBO2,
                                make_end_pred('KICKCOMBO1_END', 'S', 'kick_combo1_at', 0.25, pre_window=0.12): self.KICK_COMBO2,
                                kick_combo1_end: self.IDLE},
             self.KICK_COMBO2:{},
