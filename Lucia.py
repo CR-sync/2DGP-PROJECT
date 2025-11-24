@@ -480,6 +480,22 @@ class Lucia:
         }
         self.state_machine = StateMachine(self.IDLE, rules)
 
+        self.update_bb_for_state()
+
+    def update_bb_for_state(self):
+        tpl = self.state_bb_templates.get(self.state)
+        if tpl is not None:
+            self._bb_template = tpl
+            return
+        frames = self.sprites.get(self.state, [])
+        if frames:
+            f = frames[int(self.frame) % len(frames)]
+            src_w = max(1, (f.get('w', 0) - f.get('x', 0)))
+            src_h = max(1, (f.get('h', 0) - f.get('y', 0)))
+            half_w = int((src_w * self.scale) / 2)
+            half_h = int((src_h * self.scale) / 2)
+            self._bb_template = (half_w, half_h, 0,0)
+
     def update(self):
         self.state_machine.update()
 
