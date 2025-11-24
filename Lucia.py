@@ -63,11 +63,13 @@ LuciaSprite={
     "getUp" : [{"x":195, "y":775, "w":260, "h":805}],
 }
 
-from pico2d import load_image, get_time
+from pico2d import load_image, get_time,draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP, SDLK_s
 from state_machine import StateMachine
 import math
 from combo_manager import ComboManager
+import game_world
+import game_framework
 
 def right_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
@@ -480,3 +482,7 @@ class Lucia:
 
     def draw(self):
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        return self.x - 80, self.y - 180, self.x + 80, self.y + 180
