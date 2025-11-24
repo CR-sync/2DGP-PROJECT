@@ -385,9 +385,6 @@ class Lucia:
         def left_up_if_not_down(e):
             return left_up(e) and not getattr(self, 'down_pressed', False)
 
-        def up_within_0_25(e):
-            return up_down(e) and (get_time() - getattr(self, 'kick_at', -9999) <= 0.25)
-
         def make_end_pred(state_event_name, input_name, start_attr, window, pre_window=0.0):
             def pred(e):
                 if e[0] != state_event_name:
