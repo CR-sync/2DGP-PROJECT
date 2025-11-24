@@ -405,6 +405,19 @@ class Lucia:
         self.JUMP=Jump(self)
         self.JUMP_KICK = JumpKick(self)
 
+        self.state_bb_templates = {
+            'IDLE': (0, 0, 0),
+            'walk': (0, 0, 0),
+            'sit': (0, 0, 0),
+            'jump': (0, 0, 0),
+            'jump_kick': (0, 0, 0),
+            'kick': (0, 0, 0),
+            'kick_combo1': (0, 0, 0),
+            'kick_combo2': (0, 0, 0),
+            'KDown': (0, 0, 0),
+            'getUp': (0, 0, 0)
+        }
+
         def right_up_if_down(e):
             return right_up(e) and getattr(self, 'down_pressed', False)
 
