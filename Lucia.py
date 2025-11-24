@@ -246,15 +246,33 @@ class KickCombo1:
 
 class KickCombo2:
     def __init__(self, lucia):
-        pass
+        self.lucia=lucia
+
     def enter(self, e):
-        pass
+        self.lucia.state = 'kick_combo2'
+        self.lucia.frame = 0
+
     def exit(self, e):
         pass
+
     def do(self):
-        pass
+        frames = self.lucia.sprites.get(self.lucia.state, [])
+        frames_count = len(frames)
+        prev_frame = int(self.lucia.frame)
+
+        self.lucia.frame = (int(self.lucia.frame) + 1) % frames_count
+
+        step = int(self.lucia.speed * (1.0 / self.lucia.fps))
+        self.lucia.x += self.lucia.dir * step
+
+        if prev_frame == frames_count - 1 and int(self.lucia.frame) == 0:
+            self.lucia.state_machine.change(self.lucia.IDLE)
+
     def draw(self):
-        pass
+        draw_action = getattr(self.lucia, 'draw_action', None)
+        draw_action(self.lucia.state, self.lucia.frame, x=self.lucia.x, y=self.lucia.y,
+                    scale=self.lucia.scale, alpha=getattr(self.lucia, 'alpha', 1.0))
+
 
 class Jump:
     def __init__(self, lucia):
