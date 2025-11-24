@@ -435,7 +435,7 @@ class Lucia:
                         left_up_if_down: self.SIT,left_up_if_not_down: self.IDLE},
             self.SIT: {right_down:self.WALK, left_down:self.WALK, bottom_up:self.IDLE},
             self.KICK:{make_end_pred('KICK_END', 'UP', 'kick_at', 0.25, pre_window=0.12): self.KICK_COMBO1,kick_end: self.IDLE},
-            self.KICK_COMBO1:{},
+            self.KICK_COMBO1: {make_end_pred('KICKCOMBO1_END', 'UP', 'kick_at', 0.25, pre_window=0.12): self.KICK_COMBO2,kick_combo1_end: self.IDLE},
             self.KICK_COMBO2:{},
             self.JUMP:{s_key_down: self.JUMP_KICK},
             self.JUMP_KICK:{},
