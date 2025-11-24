@@ -498,6 +498,7 @@ class Lucia:
 
     def update(self):
         self.state_machine.update()
+        self.clamp_within_screen()
 
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
