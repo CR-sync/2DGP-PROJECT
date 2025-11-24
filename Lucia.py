@@ -345,6 +345,7 @@ class Lucia:
         self.base_y = self.y
         self.facing = 1
         self.is_backstep = False
+        self.combo = ComboManager(retention=2.0, time_func=get_time)
         self.frame = 0
         self.image = load_image('LuciaSprite.png')
 
