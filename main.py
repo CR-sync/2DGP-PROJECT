@@ -1,5 +1,6 @@
 from pico2d import *
 from Lucia import Lucia, LuciaSprite
+from enemy import Guy, GuySprite
 
 open_canvas(1200,700)
 
@@ -57,12 +58,15 @@ frame_count = max(len(LuciaSprite.get(state, [])), 1)
 delay_time = 0.14
 lucia.draw_action = draw_action
 
+guy = Guy()
+
 while running:
     handle_events()
     if not running:
         break
 
     lucia.update()
+    guy.update()
 
     clear_canvas()
     background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
@@ -74,6 +78,7 @@ while running:
     HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, x2 - x1, y2 - y1, 600, 550, (x2 - x1) * 3, (y2 - y1) * 3)
 
     lucia.draw()
+    guy.draw()
 
     update_canvas()
 
