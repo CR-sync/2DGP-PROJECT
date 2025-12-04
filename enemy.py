@@ -39,3 +39,20 @@ GuySprite={
     "getUp" : [{"x":172, "y":710, "w":218, "h":768},
                {"x":218, "y":710, "w":247, "h":768},],
 }
+
+class Guy:
+    def __init__(self):
+        pass
+
+    def handle_event(self, event):
+        pass
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+    def get_bb(self):
+        pass
+
