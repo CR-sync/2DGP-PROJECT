@@ -69,7 +69,8 @@ class Guy:
         pass
 
     def draw(self):
-        pass
+        self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
