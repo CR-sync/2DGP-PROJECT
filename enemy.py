@@ -49,7 +49,18 @@ from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
 class Guy:
     def __init__(self):
-        pass
+        self.x, self.y = 220, 190
+        self.facing = 1
+        self.is_backstep = False
+        self.frame = 0
+        self.image = load_image('GuySprite.png')
+
+        self.draw_action = None
+        self.scale = globals().get('scale', 6.0)
+        self.fps = 8.0
+        self.speed = 300.0
+        self.state = 'IDLE'
+        self.alpha = 1.0
 
     def handle_event(self, event):
         pass
