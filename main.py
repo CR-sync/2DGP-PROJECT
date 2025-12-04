@@ -10,11 +10,6 @@ HP_bar_up = load_image('font.png')
 
 state="IDLE"
 
-right_pressed = False
-right_just_pressed = False
-left_pressed = False
-left_just_pressed = False
-down_pressed = False
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 6.0, alpha: float = 1.0):
     frames = LuciaSprite.get(action, [])
