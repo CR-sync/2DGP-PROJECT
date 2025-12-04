@@ -66,7 +66,8 @@ class Guy:
         pass
 
     def update(self):
-        pass
+        self.state = 'IDLE'
+        self.frame = 0
 
     def draw(self):
         self.state_machine.draw()
