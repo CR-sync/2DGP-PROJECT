@@ -40,6 +40,13 @@ GuySprite={
                {"x":218, "y":710, "w":247, "h":768},],
 }
 
+from pico2d import *
+import random
+import math
+import game_framework
+import game_world
+from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
+
 class Guy:
     def __init__(self):
         pass
