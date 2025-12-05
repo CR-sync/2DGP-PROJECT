@@ -99,5 +99,10 @@ class Guy:
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
 
+    def set_target_relative(self, dx=0, dy=0):
+        tx = self.x + float(dx)
+        ty = self.y + float(dy)
+        return self.set_target_location(tx, ty)
+
     def build_behavior_tree(self):
         a1 = Action('Set target location', self.set_target_location, 500,0)
