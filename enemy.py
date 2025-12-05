@@ -108,8 +108,16 @@ class Guy:
     def lucia_far_x(self, distance):
         lucia = common.lucia
         if abs(self.x - lucia.x) > distance:
-            return True
-        return False
+            return BehaviorTree.SUCCESS
+        return BehaviorTree.FAIL
+
+    def set_target_near_lucia(self):
+        lucia = common.lucia
+        offset = -100 if self.x > lucia.x else 100
+        self.tx = lucia.x + offset
+        self.ty = lucia.y
+        return BehaviorTree.SUCCESS
+
 
     def build_behavior_tree(self):
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 800)
