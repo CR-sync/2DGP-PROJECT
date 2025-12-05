@@ -56,6 +56,9 @@ def handle_events():
         else:
             lucia.handle_event(event)
 
+guy = Guy()
+common.guy=guy
+guy.facing = -1
 
 lucia = Lucia()
 common.lucia=lucia
@@ -64,10 +67,6 @@ frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
 delay_time = 0.14
 lucia.draw_action = draw_action
-
-guy = Guy()
-common.guy=guy
-guy.facing = -1
 
 prev_time = time.time()
 
@@ -93,8 +92,8 @@ while running:
     HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
     HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, x2 - x1, y2 - y1, 600, 550, (x2 - x1) * 3, (y2 - y1) * 3)
 
-    lucia.draw()
     guy.draw()
+    lucia.draw()
 
     update_canvas()
 
