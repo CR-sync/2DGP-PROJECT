@@ -108,7 +108,12 @@ class Guy:
     def set_target_relative(self, dx=0, dy=0):
         tx = self.x + float(dx)
         ty = self.y + float(dy)
-        return self.set_target_location(tx, ty)
+        return self.set_target_relative(tx, ty)
 
     def build_behavior_tree(self):
-        a1 = Action('Set target location', self.set_target_location, 500,0)
+        c1 = Condition('Lucia far on x?', self.lucia_far_x, 800)
+        a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
+        a_dash = Action('Dash move to lucia', self.move_to, 100)
+        dash_seq = Sequence('Dash to lucia if far', c1, a_set, a_dash)
+
+        a1 = Action('Set target location', self.set_target_relative, 500,0)
