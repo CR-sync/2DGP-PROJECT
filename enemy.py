@@ -64,6 +64,10 @@ class Guy:
 
         self._bb_template = (30, 50, 0, 0)
 
+        self.tx, self.ty = self.x, self.y
+
+        self.build_behavior_tree()
+
     def handle_event(self, event):
         pass
 
@@ -71,6 +75,8 @@ class Guy:
         frames = GuySprite.get(self.state, [])
         frames_count = len(frames)
         self.frame = (int(self.frame) + 1) % frames_count
+
+        self.bt.run()
 
     def draw(self):
         frames = GuySprite.get(self.state, [])
