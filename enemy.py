@@ -181,6 +181,10 @@ class Guy:
 
 
     def build_behavior_tree(self):
+        c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (50, 190, 0.25))
+        a_punch = Action('Punch', self.do_punch)
+        attack_seq = Sequence('Attack sequence', c_attack, a_punch)
+
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 2))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
@@ -189,5 +193,5 @@ class Guy:
 
         a_base= Action('idle', self.set_idle)
 
-        root= Selector('Guy behavior', dash_seq, a_base)
+        root= Selector('Guy behavior', attack_seq,dash_seq, a_base)
         self.bt = BehaviorTree(root)
