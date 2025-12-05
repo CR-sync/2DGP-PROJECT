@@ -2,6 +2,8 @@ from pico2d import *
 from Lucia import Lucia, LuciaSprite
 from enemy import Guy, GuySprite
 import common
+import time
+import game_framework
 
 open_canvas(1200, 700)
 
@@ -67,7 +69,14 @@ guy = Guy()
 common.guy=guy
 guy.facing = -1
 
+prev_time = time.time()
+
 while running:
+
+    now = time.time()
+    game_framework.frame_time = now - prev_time
+    prev_time = now
+
     handle_events()
     if not running:
         break
