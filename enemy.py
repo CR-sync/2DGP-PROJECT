@@ -54,13 +54,14 @@ class Guy:
         self.is_backstep = False
         self.frame = 0
         self.image = load_image('GuySprite.png')
-
         self.draw_action = None
         self.scale = globals().get('scale', 6.0)
         self.fps = 8.0
         self.speed = 300.0
         self.state = 'IDLE'
         self.alpha = 1.0
+        # _bb_template가 필요하면 초기화해주세요
+        self._bb_template = (30, 50, 0, 0)
 
     def handle_event(self, event):
         pass
@@ -70,37 +71,23 @@ class Guy:
         self.frame = 0
 
     def draw(self):
-        # Draw using local GuySprite frames rather than an external draw_action
-        try:
-            frames = GuySprite.get(self.state, [])
-            if frames:
-                f = frames[int(self.frame) % len(frames)]
-                src_x1 = f.get('x', 0)
-                src_y1 = f.get('y', 0)
-                src_x2 = f.get('w', src_x1 + 1)
-                src_y2 = f.get('h', src_y1 + 1)
+        frames = GuySprite.get(self.state, [])
+        if frames:
+            f = frames[int(self.frame) % len(frames)]
+            src_x1 = f.get('x', 0)
+            src_y1 = f.get('y', 0)
+            src_x2 = f.get('w', src_x1 + 1)
+            src_y2 = f.get('h', src_y1 + 1)
 
-                src_w = max(1, src_x2 - src_x1)
-                src_h = max(1, src_y2 - src_y1)
+            src_w = max(1, src_x2 - src_x1)
+            src_h = max(1, src_y2 - src_y1)
+            src_bottom = self.image.h - src_y2
 
-                # pico2d image coordinate: origin bottom-left, sprite data may be top-based
-                src_bottom = self.image.h - src_y2
+            dst_w = int(src_w * self.scale)
+            dst_h = int(src_h * self.scale)
 
-                dst_w = int(src_w * self.scale)
-                dst_h = int(src_h * self.scale)
-
-                self.image.clip_draw(src_x1, src_bottom, src_w, src_h, self.x, self.y, dst_w, dst_h)
-            else:
-                # fallback: draw full image at position
-                self.image.draw(self.x, self.y)
-        except Exception:
-            # definite fallback to avoid crashes
-            try:
-                self.image.draw(self.x, self.y)
-            except Exception:
-                pass
-
-        # draw bounding box if available
+            if self.facing == -1:
+                self.image.clip_composite_draw(src_x1, src_bottom, src_w, src_h, 0, 'h', self.x, self.y, dst_w, dst_h)
 
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
@@ -109,4 +96,3 @@ class Guy:
         right = int(self.x + x_off + half_w)
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
-

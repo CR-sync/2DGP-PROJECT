@@ -62,6 +62,7 @@ delay_time = 0.14
 lucia.draw_action = draw_action
 
 guy = Guy()
+guy.facing = -1
 
 while running:
     handle_events()
