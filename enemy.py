@@ -67,6 +67,7 @@ class Guy:
 
         self.tx, self.ty = self.x, self.y
 
+        self._run_ended_time = None
         self._lucia_far_start = None
         self.build_behavior_tree()
 
@@ -179,6 +180,39 @@ class Guy:
             self._lucia_far_start = None
             return BehaviorTree.FAIL
 
+    def lucia_just_finished_run_and_close(self, params):
+        lucia= common.lucia
+        if lucia is None:
+            return BehaviorTree.FAIL
+        if isinstance(params, tuple):
+            if len(params) == 3:
+                distance, target_y, time_limit = params
+            elif len(params) == 2:
+                distance, target_y = params
+                time_limit = 0.25
+            else:
+                return BehaviorTree.FAIL
+        else:
+            distance = params
+            target_y = 190
+            time_limit = 0.25
+
+        if self._run_ended_time is None:
+            return BehaviorTree.FAIL
+
+        if (get_time() - self._run_ended_time) > float(time_limit):
+            self._run_ended_time = None
+            return BehaviorTree.FAIL
+
+        if abs(self.x - lucia.x) <= float(distance) and int(round(lucia.y)) == int(target_y):
+            self._run_ended_time = None
+            return BehaviorTree.SUCCESS
+
+        return BehaviorTree.FAIL
+
+    def do_punch(self):
+        self.state='punch'
+        return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
         c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (50, 190, 0.25))
@@ -186,7 +220,7 @@ class Guy:
         attack_seq = Sequence('Attack sequence', c_attack, a_punch)
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
-        c2 = Condition('far time', self.lucia_far_for, (500, 2))
+        c2 = Condition('far time', self.lucia_far_for, (500, 4))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
         a_dash = Action('Dash move to lucia', self.move_to, 200)
         dash_seq = Sequence('Dash to lucia if far', c1, c2, a_set, a_dash)
