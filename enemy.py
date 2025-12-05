@@ -97,3 +97,6 @@ class Guy:
         right = int(self.x + x_off + half_w)
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
+
+    def build_behavior_tree(self):
+        pass
