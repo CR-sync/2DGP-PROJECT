@@ -49,7 +49,7 @@ from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
 class Guy:
     def __init__(self):
-        self.x, self.y = 600, 190
+        self.x, self.y = 1000, 195
         self.facing = 1
         self.is_backstep = False
         self.frame = 0
