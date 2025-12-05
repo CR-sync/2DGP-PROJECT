@@ -47,6 +47,17 @@ import game_framework
 import game_world
 from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
+PIXEL_PER_METER = (10.0 / 0.3)
+
+WALK_SPEED_PPS = 120.0
+RUN_SPEED_PPS = 320.0
+DASH_SPEED_PPS = 600.0
+
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 10.0
+ANIM_FPS = FRAMES_PER_ACTION * ACTION_PER_TIME
+
 class Guy:
     def __init__(self):
         self.x, self.y = 1000, 195
@@ -67,8 +78,7 @@ class Guy:
         pass
 
     def update(self):
-        self.state = 'IDLE'
-        self.frame = 0
+        frames = GuySprite.get(self.state, [])
 
     def draw(self):
         frames = GuySprite.get(self.state, [])
