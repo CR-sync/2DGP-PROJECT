@@ -61,6 +61,7 @@ class Guy:
         self.speed = 300.0
         self.state = 'IDLE'
         self.alpha = 1.0
+        self._dash = False
 
         self._bb_template = (30, 50, 0, 0)
 
@@ -116,13 +117,27 @@ class Guy:
         offset = -100 if self.x > lucia.x else 100
         self.tx = lucia.x + offset
         self.ty = lucia.y
+        self._dash = True
         return BehaviorTree.SUCCESS
 
+    def move_to(self, x):
+        speed_pps = self.speed*4
+        self.state='run'
+
+        dx=self.tx - self.x
+        if abs(dx) < x:
+            self.dash=False
+            self.x=self.tx
+            return BehaviorTree.SUCCESS
+
+        dir_x = 1 if dx > 0 else -1
+        distance = speed_pps * game_framework.frame_time
+
+        self.facing = 1 if dir_x > 0 else -1
+        return BehaviorTree.RUNNING
 
     def build_behavior_tree(self):
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 800)
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
         a_dash = Action('Dash move to lucia', self.move_to, 100)
         dash_seq = Sequence('Dash to lucia if far', c1, a_set, a_dash)
-
-        a1 = Action('Set target location', self.set_target_relative, 500,0)
