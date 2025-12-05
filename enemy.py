@@ -97,6 +97,8 @@ class Guy:
 
             if self.facing == -1:
                 self.image.clip_composite_draw(src_x1, src_bottom, src_w, src_h, 0, 'h', self.x, self.y, dst_w, dst_h)
+            else:
+                self.image.clip_draw(src_x1, src_bottom, src_w, src_h, self.x, self.y, dst_w, dst_h)
 
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
@@ -108,38 +110,53 @@ class Guy:
 
     def lucia_far_x(self, distance):
         lucia = common.lucia
+        if lucia is None:
+            return BehaviorTree.FAIL
+        if getattr(self, '_dash', False):
+            return BehaviorTree.SUCCESS
         if abs(self.x - lucia.x) > distance:
             return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
-    def set_target_near_lucia(self):
+    def set_target_near_lucia(self,D=250):
         lucia = common.lucia
-        offset = -100 if self.x > lucia.x else 100
+        offset = D if self.x > lucia.x else -D
         self.tx = lucia.x + offset
         self.ty = lucia.y
         self._dash = True
         return BehaviorTree.SUCCESS
 
     def move_to(self, x):
-        speed_pps = self.speed*4
+        speed_pps = self.speed*2.5
         self.state='run'
 
         dx=self.tx - self.x
-        if abs(dx) < x:
-            self.dash=False
+        if abs(dx) <= x:
+            self._dash=False
             self.x=self.tx
             return BehaviorTree.SUCCESS
 
         dir_x = 1 if dx > 0 else -1
         distance = speed_pps * game_framework.frame_time
+        move_x = dir_x * distance
+
+        if abs(move_x) >= abs(dx):
+            self.x = float(self.tx)
+            self._dash = False
+        else:
+            self.x += move_x
 
         self.facing = 1 if dir_x > 0 else -1
         return BehaviorTree.RUNNING
 
+    def set_idle(self):
+        self.state='IDLE'
+        return BehaviorTree.SUCCESS
+
     def build_behavior_tree(self):
-        c1 = Condition('Lucia far on x?', self.lucia_far_x, 800)
+        c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
-        a_dash = Action('Dash move to lucia', self.move_to, 100)
+        a_dash = Action('Dash move to lucia', self.move_to, 250)
         dash_seq = Sequence('Dash to lucia if far', c1, a_set, a_dash)
 
         a_base= Action('idle', self.set_idle)
