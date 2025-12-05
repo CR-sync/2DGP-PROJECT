@@ -13,7 +13,7 @@ state="IDLE"
 
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 6.0, alpha: float = 1.0):
-    frames = LuciaSprite.get(action, [])
+    frames = sprite_dict.get(action, [])
     f = frames[i % len(frames)]
     src_x1 = f["x"]
     src_y1 = f["y"]
@@ -52,6 +52,9 @@ def handle_events():
             lucia.handle_event(event)
             
 lucia = Lucia()
+lucia.draw_action = lambda action, i, x=lucia.x, y=lucia.y, scale=lucia.scale, alpha=lucia.alpha: \
+    draw_action(LuciaSprite, character, action, i, x, y, scale, alpha)
+
 LuciaX, LuciaY = lucia.x, lucia.y
 frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
@@ -59,6 +62,8 @@ delay_time = 0.14
 lucia.draw_action = draw_action
 
 guy = Guy()
+Guy.draw_action = lambda action, i, x=lucia.x, y=lucia.y, scale=lucia.scale, alpha=lucia.alpha: \
+    draw_action(GuySprite, character, action, i, x, y, scale, alpha)
 
 while running:
     handle_events()
