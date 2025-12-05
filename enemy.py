@@ -70,8 +70,37 @@ class Guy:
         self.frame = 0
 
     def draw(self):
-        self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
+        # Draw using local GuySprite frames rather than an external draw_action
+        try:
+            frames = GuySprite.get(self.state, [])
+            if frames:
+                f = frames[int(self.frame) % len(frames)]
+                src_x1 = f.get('x', 0)
+                src_y1 = f.get('y', 0)
+                src_x2 = f.get('w', src_x1 + 1)
+                src_y2 = f.get('h', src_y1 + 1)
+
+                src_w = max(1, src_x2 - src_x1)
+                src_h = max(1, src_y2 - src_y1)
+
+                # pico2d image coordinate: origin bottom-left, sprite data may be top-based
+                src_bottom = self.image.h - src_y2
+
+                dst_w = int(src_w * self.scale)
+                dst_h = int(src_h * self.scale)
+
+                self.image.clip_draw(src_x1, src_bottom, src_w, src_h, self.x, self.y, dst_w, dst_h)
+            else:
+                # fallback: draw full image at position
+                self.image.draw(self.x, self.y)
+        except Exception:
+            # definite fallback to avoid crashes
+            try:
+                self.image.draw(self.x, self.y)
+            except Exception:
+                pass
+
+        # draw bounding box if available
 
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template

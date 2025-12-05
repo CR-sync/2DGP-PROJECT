@@ -2,18 +2,18 @@ from pico2d import *
 from Lucia import Lucia, LuciaSprite
 from enemy import Guy, GuySprite
 
-open_canvas(1200,700)
+open_canvas(1200, 700)
 
 background = load_image('background.png')
 character = load_image('LuciaSprite.png')
 HP_bar_down = load_image('font.png')
 HP_bar_up = load_image('font.png')
 
-state="IDLE"
+state = "IDLE"
 
 
 def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 6.0, alpha: float = 1.0):
-    frames = sprite_dict.get(action, [])
+    frames = LuciaSprite.get(action, [])
     f = frames[i % len(frames)]
     src_x1 = f["x"]
     src_y1 = f["y"]
@@ -23,7 +23,7 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
     src_w = src_x2 - src_x1
     src_h = src_y2 - src_y1
 
-    #화면 아래쪽이 기준이므로 변환
+    # 화면 아래쪽이 기준이므로 변환
     src_bottom = character.h - src_y2
 
     dst_w = int(src_w * scale)
@@ -38,7 +38,9 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
 
     character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
+
 running = True
+
 
 def handle_events():
     global running, LuciaX, LuciaY, right_pressed, right_just_pressed, left_pressed, left_just_pressed, state, down_pressed
@@ -50,11 +52,9 @@ def handle_events():
             running = False
         else:
             lucia.handle_event(event)
-            
-lucia = Lucia()
-lucia.draw_action = lambda action, i, x=lucia.x, y=lucia.y, scale=lucia.scale, alpha=lucia.alpha: \
-    draw_action(LuciaSprite, character, action, i, x, y, scale, alpha)
 
+
+lucia = Lucia()
 LuciaX, LuciaY = lucia.x, lucia.y
 frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
@@ -62,8 +62,6 @@ delay_time = 0.14
 lucia.draw_action = draw_action
 
 guy = Guy()
-Guy.draw_action = lambda action, i, x=lucia.x, y=lucia.y, scale=lucia.scale, alpha=lucia.alpha: \
-    draw_action(GuySprite, character, action, i, x, y, scale, alpha)
 
 while running:
     handle_events()
