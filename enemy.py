@@ -141,3 +141,8 @@ class Guy:
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
         a_dash = Action('Dash move to lucia', self.move_to, 100)
         dash_seq = Sequence('Dash to lucia if far', c1, a_set, a_dash)
+
+        a_base= Action('idle', self.set_idle)
+
+        root= Selector('Guy behavior', dash_seq, a_base)
+        self.bt = BehaviorTree(root)
