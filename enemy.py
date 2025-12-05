@@ -45,6 +45,7 @@ import random
 import math
 import game_framework
 import game_world
+import common
 from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 
 class Guy:
@@ -99,4 +100,4 @@ class Guy:
         return left, bottom, right, top
 
     def build_behavior_tree(self):
-        pass
+        a1 = Action('Set target location', self.set_target_location, 500,0)
