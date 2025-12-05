@@ -71,17 +71,6 @@ from combo_manager import ComboManager
 import game_world
 import game_framework
 
-PIXEL_PER_METER = (10.0 / 0.3)
-
-WALK_SPEED_PPS = 120.0
-RUN_SPEED_PPS = 320.0
-DASH_SPEED_PPS = 600.0
-
-TIME_PER_ACTION = 0.5
-ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 10.0
-ANIM_FPS = FRAMES_PER_ACTION * ACTION_PER_TIME
-
 def right_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
 def right_up(e):
