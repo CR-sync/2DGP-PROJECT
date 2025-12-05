@@ -155,9 +155,10 @@ class Guy:
 
     def build_behavior_tree(self):
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
+        c2 = Condition('far time', self.lucia_far_for, (500, 2))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
         a_dash = Action('Dash move to lucia', self.move_to, 250)
-        dash_seq = Sequence('Dash to lucia if far', c1, a_set, a_dash)
+        dash_seq = Sequence('Dash to lucia if far', c1, c2, a_set, a_dash)
 
         a_base= Action('idle', self.set_idle)
 
