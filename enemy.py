@@ -105,10 +105,11 @@ class Guy:
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
 
-    def set_target_relative(self, dx=0, dy=0):
-        tx = self.x + float(dx)
-        ty = self.y + float(dy)
-        return self.set_target_relative(tx, ty)
+    def lucia_far_x(self, distance):
+        lucia = common.lucia
+        if abs(self.x - lucia.x) > distance:
+            return True
+        return False
 
     def build_behavior_tree(self):
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 800)
