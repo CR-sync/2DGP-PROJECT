@@ -1,5 +1,5 @@
 GuySprite={
-    "IDLE":[{"x":0, "y":143, "w":53, "h":205},
+    "IDLE":[{"x":13, "y":143, "w":53, "h":205},
             {"x":53, "y":143, "w":95, "h":205},],
 
     "walk":[{"x":101, "y":140, "w":138, "h":205},
@@ -60,7 +60,7 @@ class Guy:
         self.speed = 300.0
         self.state = 'IDLE'
         self.alpha = 1.0
-        # _bb_template가 필요하면 초기화해주세요
+
         self._bb_template = (30, 50, 0, 0)
 
     def handle_event(self, event):
@@ -68,6 +68,8 @@ class Guy:
 
     def update(self):
         frames = GuySprite.get(self.state, [])
+        frames_count = len(frames)
+        self.frame = (int(self.frame) + 1) % frames_count
 
     def draw(self):
         frames = GuySprite.get(self.state, [])
