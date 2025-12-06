@@ -303,12 +303,46 @@ class Guy:
         # 기본: 실패 아님
         return BehaviorTree.SUCCESS
 
+    def do_backstep(self, distance=100):
+        lucia = common.lucia
+        if lucia is None:
+            return BehaviorTree.FAIL
+
+        # 시작 시 목표 설정
+        if not getattr(self, '_backstepping', False):
+            self._backstepping = True
+            # 루시아가 오른쪽에 있으면 왼쪽으로 도망가고, 반대면 오른쪽으로
+            dir_away = -1 if lucia.x > self.x else 1
+            self._backstep_target = float(self.x + dir_away * float(distance))*1.25
+            self.state = 'IDLE'
+            self.frame = 0
+            self._dash = False
+            return BehaviorTree.RUNNING
+
+        # 이동 처리
+        dx = self._backstep_target - self.x
+        # 정지 임계값
+        if abs(dx) <= 5.0:
+            self._backstepping = False
+            return BehaviorTree.SUCCESS
+
+        dir_x = 1 if dx > 0 else -1
+        speed_pps = self.speed * 5
+        move_x = dir_x * (speed_pps * game_framework.frame_time)/4
+
+        if abs(move_x) >= abs(dx):
+            self.x = float(self._backstep_target)
+        else:
+            self.x += move_x
+
+        return BehaviorTree.RUNNING
+
     def build_behavior_tree(self):
         # 공격 시퀀스: 공격 후 콤보, 그리고 공격 종료 후 백스텝
         c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
         a_punch = Action('Punch', self.do_punch)
         a_combo = Action('Combo handler', self.handle_combo_chain)
-        a_back_after = Action('Backstep after attack', self.do_backstep, 120)
+        a_back_after = Action('Backstep after attack', self.do_backstep, 150)
         attack_seq = Sequence('Attack sequence', c_attack, a_punch, a_combo, a_back_after)
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
