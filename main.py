@@ -56,10 +56,6 @@ def handle_events():
         else:
             lucia.handle_event(event)
 
-guy = Guy()
-common.guy=guy
-guy.facing = -1
-
 lucia = Lucia()
 common.lucia=lucia
 LuciaX, LuciaY = lucia.x, lucia.y
@@ -67,6 +63,10 @@ frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
 delay_time = 0.14
 lucia.draw_action = draw_action
+
+guy = Guy()
+common.guy=guy
+guy.facing = -1
 
 prev_time = time.time()
 
