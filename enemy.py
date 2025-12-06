@@ -51,6 +51,8 @@ from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
 class Guy:
     def __init__(self):
         self.x, self.y = 1000, 195
+        self._backstepping = False
+        self._backstep_target = float(self.x)
         self.facing = 1
         self.is_backstep = False
         self.frame = 0
@@ -302,10 +304,12 @@ class Guy:
         return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
+        # 공격 시퀀스: 공격 후 콤보, 그리고 공격 종료 후 백스텝
         c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
         a_punch = Action('Punch', self.do_punch)
         a_combo = Action('Combo handler', self.handle_combo_chain)
-        attack_seq = Sequence('Attack sequence', c_attack, a_punch, a_combo)
+        a_back_after = Action('Backstep after attack', self.do_backstep, 120)
+        attack_seq = Sequence('Attack sequence', c_attack, a_punch, a_combo, a_back_after)
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 3))
