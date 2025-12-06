@@ -338,6 +338,10 @@ class Guy:
         return BehaviorTree.RUNNING
 
     def build_behavior_tree(self):
+        # 가까운지 확인하고 행동 결정
+        c_close = Condition('Lucia is close', self.is_lucia_close, 150)
+        a_decide = Action('Decide close action', self.decide_close_action)
+
         # 공격 시퀀스: 공격 후 콤보, 그리고 공격 종료 후 백스텝
         c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
         a_punch = Action('Punch', self.do_punch)
