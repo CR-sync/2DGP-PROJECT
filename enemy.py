@@ -283,6 +283,21 @@ class Guy:
                 self.state = 'IDLE'
                 return BehaviorTree.SUCCESS
 
+        # 콤보2 진행 중
+        if self._combo_phase == 2:
+            frames = GuySprite.get('punch_combo2', [])
+            frames_count = len(frames)
+            duration = (frames_count / float(self.fps)) if self.fps > 0 else 0.5
+            elapsed = get_time() - (self._combo_start or 0)
+            if elapsed < duration:
+                return BehaviorTree.RUNNING
+            # 콤보2 끝
+            print('[DBG] combo_chain: combo2 finished')
+            self._combo_phase = None
+            self._combo_start = None
+            self.state = 'IDLE'
+            return BehaviorTree.SUCCESS
+
         # 기본: 실패 아님
         return BehaviorTree.SUCCESS
 
