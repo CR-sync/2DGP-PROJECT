@@ -229,6 +229,8 @@ class Guy:
             self.frame = 0
             self._dash = False
             self._run_ended_time = None
+            self._combo_phase = None
+            self._combo_start = None
             return BehaviorTree.RUNNING
 
         # 펀치 중: 시간이 다 되면 종료
