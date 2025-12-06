@@ -339,7 +339,7 @@ class Guy:
 
     def build_behavior_tree(self):
         # 가까운지 확인하고 행동 결정
-        c_close = Condition('Lucia is close', self.is_lucia_close, 150)
+        c_close = Condition('Lucia is close', lambda: BehaviorTree.SUCCESS if abs(self.x-common.lucia.x)<=150 else BehaviorTree.FAIL)
         a_decide = Action('Decide close action', self.decide_close_action)
 
         # 공격 시퀀스: 공격 후 콤보, 그리고 공격 종료 후 백스텝
