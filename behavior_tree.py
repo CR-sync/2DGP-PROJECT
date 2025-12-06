@@ -14,7 +14,6 @@ def print_indent():
 
 
 class BehaviorTree:
-    FAIL, RUNNING, SUCCESS = -1, 0, 1
     FAIL, RUNNING, SUCCESS, UNDEF = 'FAIL', 'RUNNING', 'SUCCESS', 'UNDEF'
 
     # how to run node?
@@ -34,6 +33,8 @@ class BehaviorTree:
 
 
 class Node:
+    def __init__(self):
+        self.children = []
 
     def add_child(self, child):
         self.children.append(child)
@@ -52,6 +53,7 @@ class Node:
 
 class Selector(Node):
     def __init__(self, name, *nodes):
+        super().__init__()
         self.children = list(nodes)
         self.name = name
         self.value = BehaviorTree.UNDEF
@@ -60,6 +62,7 @@ class Selector(Node):
 
     def reset(self):
         self.value = BehaviorTree.UNDEF
+        self.prev_running_pos = 0
         for child in self.children:
             child.reset()
 
@@ -68,12 +71,6 @@ class Selector(Node):
             child.tag_condition()
             if child.has_condition:
                 self.has_condition = True
-
-
-    def reset(self):
-        self.prev_running_pos = 0
-        for node in self.children:
-            node.reset()
 
 
     @Node.show_result
@@ -99,6 +96,7 @@ class Selector(Node):
 
 class Sequence(Node):
     def __init__(self, name, *nodes):
+        super().__init__()
         self.children = list(nodes)
         self.name = name
         self.value = BehaviorTree.UNDEF
@@ -106,7 +104,9 @@ class Sequence(Node):
         self.prev_running_pos = 0
 
     def reset(self):
+        # reset state and all children
         self.value = BehaviorTree.UNDEF
+        self.prev_running_pos = 0
         for child in self.children:
             child.reset()
 
@@ -117,22 +117,36 @@ class Sequence(Node):
                 self.has_condition = True
 
 
-
     @Node.show_result
     def run(self):
-        for child in self.children:
+        start = 0
+        if 0 <= self.prev_running_pos < len(self.children) and self.children[self.prev_running_pos].value == BehaviorTree.RUNNING:
+            start = self.prev_running_pos
+
+        for i in range(start, len(self.children)):
+            child = self.children[i]
+            # Only (re)evaluate this child
             if (child.value in (BehaviorTree.UNDEF, BehaviorTree.RUNNING)) or child.has_condition:
                 self.value = child.run()
-                if self.value in (BehaviorTree.RUNNING, BehaviorTree.FAIL):
+                if self.value == BehaviorTree.RUNNING:
+                    # remember position to resume next tick
+                    self.prev_running_pos = i
+                    return self.value
+                if self.value == BehaviorTree.FAIL:
+                    # reset resume position on failure
+                    self.prev_running_pos = 0
                     return self.value
 
+        # all children succeeded
         self.value = BehaviorTree.SUCCESS
+        self.prev_running_pos = 0
         return self.value
 
 
 
 class Action(Node):
     def __init__(self, name, func, *args):
+        super().__init__()
         self.name = name
         self.func = func
         self.args = list(args) if args else []
@@ -165,6 +179,7 @@ class Action(Node):
 
 class Condition(Node):
     def __init__(self, name, func, *args):
+        super().__init__()
         self.name = name
         self.func = func
         self.args = list(args) if args else []
