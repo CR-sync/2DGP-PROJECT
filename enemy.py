@@ -20,13 +20,13 @@ GuySprite={
              {"x":51, "y":355, "w":105, "h":420},
               {"x":110, "y":355, "w":166, "h":420}],
 
-    "punch_combo1" : [{"x":166, "y":348, "w":212, "h":420},
-                      {"x":212, "y":348, "w":268, "h":420},
-                      {"x":268, "y":348, "w":308, "h":420},],
+    "punch_combo1" : [{"x":166, "y":348, "w":212, "h":425},
+                      {"x":212, "y":348, "w":268, "h":425},
+                      {"x":268, "y":348, "w":308, "h":425},],
 
-    "punch_combo2" : [{"x":308, "y":348, "w":350, "h":420},
-                     {"x":350, "y":348, "w":396, "h":420},
-                     {"x":396, "y":348, "w":435, "h":420},],
+    "punch_combo2" : [{"x":308, "y":348, "w":350, "h":425},
+                     {"x":350, "y":348, "w":396, "h":425},
+                     {"x":396, "y":348, "w":435, "h":425},],
 
     "defense" : [{"x":0, "y":428, "w":56, "h":477},
                  {"x":56, "y":428, "w":110, "h":477},],
@@ -242,6 +242,49 @@ class Guy:
             return BehaviorTree.SUCCESS
 
         return BehaviorTree.RUNNING
+
+    def handle_combo_chain(self):
+        # 콤보가 아예 시작되지 않은 상태: 확률로 시작 여부 결정
+        if getattr(self, '_combo_phase', None) is None:
+            # 50% 확률로 콤보1 시작
+            if random.random() < 0.5:
+                # 시작
+                self._combo_phase = 1
+                self._combo_start = get_time()
+                self.state = 'punch_combo1'
+                self.frame = 0
+                print('[DBG] combo_chain: start punch_combo1')
+                return BehaviorTree.RUNNING
+            else:
+                # 콤보 없음
+                return BehaviorTree.SUCCESS
+
+        # 콤보1 진행 중
+        if self._combo_phase == 1:
+            frames = GuySprite.get('punch_combo1', [])
+            frames_count = len(frames)
+            duration = (frames_count / float(self.fps)) if self.fps > 0 else 0.5
+            elapsed = get_time() - (self._combo_start or 0)
+            if elapsed < duration:
+                return BehaviorTree.RUNNING
+            # 콤보1 끝남: 50% 확률로 콤보2로 연계
+            if random.random() < 0.5:
+                self._combo_phase = 2
+                self._combo_start = get_time()
+                self.state = 'punch_combo2'
+                self.frame = 0
+                print('[DBG] combo_chain: chain to punch_combo2')
+                return BehaviorTree.RUNNING
+            else:
+                # 콤보 종료
+                print('[DBG] combo_chain: combo1 finished, no chain')
+                self._combo_phase = None
+                self._combo_start = None
+                self.state = 'IDLE'
+                return BehaviorTree.SUCCESS
+
+        # 기본: 실패 아님
+        return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
         c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
