@@ -18,7 +18,7 @@ GuySprite={
 
     "punch": [{"x":10, "y":355, "w":51, "h":420},
              {"x":51, "y":355, "w":105, "h":420},
-              {"x":110, "y":348, "w":166, "h":420}],
+              {"x":110, "y":355, "w":166, "h":420}],
 
     "punch_combo1" : [{"x":166, "y":348, "w":212, "h":420},
                       {"x":212, "y":348, "w":268, "h":420},
@@ -136,6 +136,7 @@ class Guy:
         if abs(dx) <= float(x):
             self._dash=False
             self.x=self.tx
+            self._run_ended_time = get_time()
             return BehaviorTree.SUCCESS
 
         dir_x = 1 if dx > 0 else -1
@@ -145,6 +146,7 @@ class Guy:
         if abs(move_x) >= abs(dx):
             self.x = float(self.tx)
             self._dash = False
+            self._run_ended_time = get_time()
         else:
             self.x += move_x
 
@@ -189,13 +191,13 @@ class Guy:
                 distance, target_y, time_limit = params
             elif len(params) == 2:
                 distance, target_y = params
-                time_limit = 0.25
+                time_limit = 0.5
             else:
                 return BehaviorTree.FAIL
         else:
             distance = params
             target_y = 190
-            time_limit = 0.25
+            time_limit = 0.5
 
         if self._run_ended_time is None:
             return BehaviorTree.FAIL
@@ -204,23 +206,48 @@ class Guy:
             self._run_ended_time = None
             return BehaviorTree.FAIL
 
-        if abs(self.x - lucia.x) <= float(distance) and int(round(lucia.y)) == int(target_y):
+        y_ok = abs(int(round(lucia.y)) - int(target_y)) <= 5
+
+        # Y 허용오차(y_ok)를 실제 판정에 사용
+        if abs(self.x - lucia.x) <= float(distance) and y_ok:
             self._run_ended_time = None
             return BehaviorTree.SUCCESS
 
         return BehaviorTree.FAIL
 
     def do_punch(self):
-        self.state='punch'
-        return BehaviorTree.SUCCESS
+        # 펀치 애니메이션 동안 RUNNING을 반환하고, 애니메이션이 끝나면 SUCCESS를 반환
+        frames = GuySprite.get('punch', [])
+        frames_count = len(frames)
+        duration = (frames_count / float(self.fps)) if self.fps > 0 else 0.5
+
+        if not getattr(self, '_punching', False):
+            # 펀치 시작
+            self._punching = True
+            self._punch_start = get_time()
+            self.state = 'punch'
+            self.frame = 0
+            self._dash = False
+            self._run_ended_time = None
+            return BehaviorTree.RUNNING
+
+        # 펀치 중: 시간이 다 되면 종료
+        elapsed = get_time() - getattr(self, '_punch_start', 0)
+        if elapsed >= duration:
+            self._punching = False
+            # 완료 후에는 IDLE로 전환
+            self.state = 'IDLE'
+            return BehaviorTree.SUCCESS
+
+        return BehaviorTree.RUNNING
 
     def build_behavior_tree(self):
-        c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (50, 190, 0.25))
+        c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
         a_punch = Action('Punch', self.do_punch)
         attack_seq = Sequence('Attack sequence', c_attack, a_punch)
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
-        c2 = Condition('far time', self.lucia_far_for, (500, 4))
+        c2 = Condition('far time', self.lucia_far_for, (500, 3))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
         a_dash = Action('Dash move to lucia', self.move_to, 200)
         dash_seq = Sequence('Dash to lucia if far', c1, c2, a_set, a_dash)
