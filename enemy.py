@@ -361,6 +361,10 @@ class Guy:
 
         return BehaviorTree.SUCCESS
 
+    def close_choice_is(self, params):
+        choice = params
+        return BehaviorTree.SUCCESS if getattr(self, '_close_choice', None) == choice else BehaviorTree.FAIL
+
     def build_behavior_tree(self):
         # 가까운지 확인하고 행동 결정
         c_close = Condition('Lucia is close', lambda: BehaviorTree.SUCCESS if abs(self.x-common.lucia.x)<=150 else BehaviorTree.FAIL)
