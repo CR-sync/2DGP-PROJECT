@@ -33,25 +33,48 @@ def init():
 
 def update():
     game_world.update()
+    # 수집: 각 캐릭터의 활성 히트박스(공격용)와 현재 허트박스(피격면)
     lucia_hits = lucia.get_active_hitboxes()
     enemy_hits = guy.get_active_hitboxes()
     lucia_hurt = lucia.get_current_hurtbox()
     enemy_hurt = guy.get_current_hurtbox()
 
+    # None 허트박스는 제외
     hurt_list = [hb for hb in (lucia_hurt, enemy_hurt) if hb is not None]
-    hits = check_collisions(lucia_hits + enemy_hits, [lucia_hurt, enemy_hurt], frame=int(lucia.frame))
 
-    for hitbox, hurtbox in hits:
-        # hitbox.owner 이 공격자, hurtbox.owner 이 피격자
+    # 공격 리스트: 양쪽의 히트박스 합침
+    attack_list = []
+    if lucia_hits:
+        attack_list.extend(lucia_hits)
+    if enemy_hits:
+        attack_list.extend(enemy_hits)
+
+    # 충돌 검사 실행 (frame은 Lucia의 frame 사용 — 양쪽이 동일한 프레임 스케일을 써야 정확함)
+    if attack_list and hurt_list:
+        hits = check_collisions(attack_list, hurt_list, frame=int(lucia.frame))
+    else:
+        hits = []
+
+    # 자기 자신에게 걸린 충돌(공격자와 피격자의 owner가 동일)은 무시
+    filtered_hits = [(hb, hurt) for (hb, hurt) in hits if getattr(hb, 'owner', None) is not getattr(hurt, 'owner', None)]
+
+    for hitbox, hurtbox in filtered_hits:
         victim = hurtbox.owner
         attacker = hitbox.owner
         print(f"[COLLISION] {attacker.__class__.__name__}.{getattr(attacker, 'state', '')} -> {victim.__class__.__name__}.{getattr(victim, 'state', '')} dmg={hitbox.damage}")
-        # 가능한 경우 on_hit을 호출해 무적 로직을 활용
+        # 우선 on_hit 메서드가 있으면 호출 (예: 무적 처리, 특수 반응)
         if hasattr(victim, 'on_hit') and callable(getattr(victim, 'on_hit')):
-            victim.on_hit(hitbox.damage)
+            try:
+                victim.on_hit(hitbox.damage)
+            except Exception as e:
+                print(f"Exception in on_hit: {e}")
         else:
-            # fallback
-            victim.hp -= hitbox.damage
+            # fallback: 직접 HP 차감
+            if hasattr(victim, 'hp'):
+                try:
+                    victim.hp -= hitbox.damage
+                except Exception as e:
+                    print(f"Error applying damage: {e}")
 
 def draw():
     clear_canvas()
