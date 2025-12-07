@@ -589,3 +589,11 @@ class Lucia:
         if right > screen_w:
             self.x += (screen_w - right)
 
+    # 히트 처리 메서드 추가
+    def on_hit(self, damage):
+        current_time = get_time()
+        if current_time >= self._invulnerable_until:  # 무적 시간이 아닐 때만 피해를 받음
+            self.hp -= damage
+            print(f"Lucia got hit! HP: {self.hp}")
+            self._invulnerable_until = current_time + 1.0  # 1초간 무적
+
