@@ -373,6 +373,10 @@ class Guy:
         a_back_after = Action('Backstep after attack', self.do_backstep, 150)
         attack_seq = Sequence('Attack sequence', c_attack, a_punch, a_combo, a_back_after)
 
+        # 방어 시퀀스
+        c_choice_defend = Condition('choice==defend', self.close_choice_is, 'defend')
+        a_defend = Action('Defend', self.do_defend)
+
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 3))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
