@@ -47,6 +47,7 @@ import game_framework
 import game_world
 import common
 from behavior_tree import BehaviorTree, Action, Sequence, Condition, Selector
+from hitbox import Hitbox, Hurtbox
 
 class Guy:
     def __init__(self):
@@ -75,7 +76,9 @@ class Guy:
         self._defending = None
         self._close_choice = None
 
-        self._bb_template = (30, 50, 0, 0)
+        self._bb_template = (100, 190, 0, 0)
+
+        self.hitbox_defs = {}
 
         self.tx, self.ty = self.x, self.y
 
@@ -113,6 +116,9 @@ class Guy:
                 self.image.clip_composite_draw(src_x1, src_bottom, src_w, src_h, 0, 'h', self.x, self.y, dst_w, dst_h)
             else:
                 self.image.clip_draw(src_x1, src_bottom, src_w, src_h, self.x, self.y, dst_w, dst_h)
+
+        # 기본 바운딩 박스(몸통) 그리기
+        draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
