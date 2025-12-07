@@ -395,11 +395,11 @@ class Guy:
         a_decide = Action('Decide close action', self.decide_close_action)
 
         # 공격 시퀀스: 공격 후 콤보, 그리고 공격 종료 후 백스텝
-        c_attack = Condition('Can punch just after run', self.lucia_just_finished_run_and_close, (200, 190, 0.5))
+        c_choice_attack = Condition('choice==attack', self.close_choice_is, 'attack')
         a_punch = Action('Punch', self.do_punch)
         a_combo = Action('Combo handler', self.handle_combo_chain)
         a_back_after = Action('Backstep after attack', self.do_backstep, 150)
-        attack_seq = Sequence('Attack sequence', c_attack, a_punch, a_combo, a_back_after)
+        seq_attack_close = Sequence('Close attack seq', c_choice_attack, a_punch, a_combo, a_back_after)
 
         # 방어 시퀀스
         c_choice_defend = Condition('choice==defend', self.close_choice_is, 'defend')
