@@ -76,12 +76,12 @@ class Guy:
         self._defending = None
         self._close_choice = None
 
-        self._bb_template = (100, 190, 0, 0)
+        self._bb_template = (80, 190, 0, 0)
 
         self.hitbox_defs = {
-            'punch': [(40, 10, 60, 20, 1, 2, 'punch_fist', 5)],
-            'punch_combo1': [(50, 10, 70, 22, 1, 2, 'punch_c1_fist', 10)],
-            'punch_combo2': [(70, 10, 80, 24, 1, 2, 'punch_c2_fist', 20)],
+            'punch': [(5, 10, 20, 20, 1, 2, 'punch_fist', 5)],
+            'punch_combo1': [(5, 10, 20, 22, 1, 2, 'punch_c1_fist', 10)],
+            'punch_combo2': [(5, 10, 20, 24, 1, 2, 'punch_c2_fist', 20)],
         }
 
         self.tx, self.ty = self.x, self.y
@@ -141,7 +141,11 @@ class Guy:
         return left, bottom, right, top
 
     def get_current_hurtbox(self):
-        half_w, half_h, y_off, x_off = getattr(self, '_bb_template', (30, 50, 0, 0))
+        active_states = {'punch', 'punch_combo1', 'punch_combo2'}
+        if self.state not in active_states:
+            return None
+
+        half_w, half_h, y_off, x_off = getattr(self, '_bb_template')
         w = float(half_w * 2)
         h = float(half_h * 2)
         ox = float(x_off) * self.scale

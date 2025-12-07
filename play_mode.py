@@ -38,6 +38,7 @@ def update():
     lucia_hurt = lucia.get_current_hurtbox()
     enemy_hurt = guy.get_current_hurtbox()
 
+    hurt_list = [hb for hb in (lucia_hurt, enemy_hurt) if hb is not None]
     hits = check_collisions(lucia_hits + enemy_hits, [lucia_hurt, enemy_hurt], frame=int(lucia.frame))
 
     for hitbox, hurtbox in hits:
