@@ -560,6 +560,18 @@ class Lucia:
         # _bb_template의 x_off/y_off는 이미 월드 오프셋이므로 그대로 사용
         return Hurtbox(x_off, y_off, w, h, owner=self)
 
+    # 현재 상태에서 활성화된 히트박스 목록을 생성
+    def get_active_hitboxes(self):
+        defs = self.hitbox_defs.get(self.state, [])
+        active = []
+        cur_frame = int(getattr(self, 'frame', 0))
+        for off_x, off_y, w, h, start_f, end_f, tag, dmg in defs:
+            hb = Hitbox(off_x * self.scale, off_y * self.scale, w * self.scale, h * self.scale,
+                        owner=self, damage=dmg, start_frame=start_f, end_frame=end_f, tag=tag)
+            if hb.is_active(cur_frame):
+                active.append(hb)
+        return active
+
     def clamp_within_screen(self, screen_w=None):
         if screen_w is None:
             screen_w = globals().get('SCREEN_WIDTH', 1200)
