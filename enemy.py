@@ -124,6 +124,14 @@ class Guy:
         # 기본 바운딩 박스(몸통) 그리기
         draw_rectangle(*self.get_bb())
 
+        # (몸통)
+        hurt = self.get_current_hurtbox()
+        if hurt is not None:
+            draw_rectangle(*hurt.world_rect_for())
+
+        for hb in self.get_active_hitboxes():
+            draw_rectangle(*hb.world_rect_for(int(self.frame)))
+
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
         left = int(self.x + x_off - half_w)
