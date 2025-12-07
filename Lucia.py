@@ -564,6 +564,9 @@ class Lucia:
     # 현재 상태에서 활성화된 히트박스 목록을 생성
     def get_active_hitboxes(self):
         defs = self.hitbox_defs.get(self.state, [])
+        if not isinstance(defs, (list, tuple)):
+            return []
+
         active = []
         cur_frame = int(getattr(self, 'frame', 0))
         for off_x, off_y, w, h, start_f, end_f, tag, dmg in defs:
