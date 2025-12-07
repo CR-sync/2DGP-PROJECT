@@ -252,6 +252,8 @@ class Guy:
             self._punching = False
             # 완료 후에는 IDLE로 전환
             self.state = 'IDLE'
+            # 공격(기본 펀치) 완료 시점에 공격 쿨타임을 기록
+            self._last_action_time['attack'] = get_time()
             return BehaviorTree.SUCCESS
 
         return BehaviorTree.RUNNING
@@ -269,7 +271,8 @@ class Guy:
                 print('[DBG] combo_chain: start punch_combo1')
                 return BehaviorTree.RUNNING
             else:
-                #콤보 없음
+                # 콤보 없음 — 이 경우 공격 흐름이 끝났으므로 공격 쿨타임 기록
+                self._last_action_time['attack'] = get_time()
                 return BehaviorTree.SUCCESS
 
         # 콤보1 진행 중
@@ -294,6 +297,8 @@ class Guy:
                 self._combo_phase = None
                 self._combo_start = None
                 self.state = 'IDLE'
+                # 전체 공격(콤보 포함) 종료 시점에 공격 쿨타임 기록
+                self._last_action_time['attack'] = get_time()
                 return BehaviorTree.SUCCESS
 
         # 콤보2 진행 중
@@ -309,6 +314,8 @@ class Guy:
             self._combo_phase = None
             self._combo_start = None
             self.state = 'IDLE'
+            # 콤보2까지 끝난 경우에도 공격 쿨타임 기록
+            self._last_action_time['attack'] = get_time()
             return BehaviorTree.SUCCESS
 
         # 기본: 실패 아님
@@ -335,6 +342,8 @@ class Guy:
         # 정지 임계값
         if abs(dx) <= 5.0:
             self._backstepping = False
+            # 백스텝 완료 시 타임스탬프 기록
+            self._last_action_time['back'] = get_time()
             return BehaviorTree.SUCCESS
 
         dir_x = 1 if dx > 0 else -1
@@ -349,6 +358,7 @@ class Guy:
         return BehaviorTree.RUNNING
 
     def decide_close_action(self):
+        # 전역 결정 쿨타임과 행동별 쿨타임을 고려해서 근거리 행동을 선택
         now = get_time()
         last_decide = getattr(self, '_last_close_decide', 0) or 0
         if last_decide + getattr(self, '_decision_cooldown', 0.35) > now and getattr(self, '_close_choice', None):
@@ -379,6 +389,7 @@ class Guy:
         cum = 0.0
         for i, w in enumerate(weights):
             cum += w
+            if r <= cum:
                 self._close_choice = candidates[i]
                 break
 
@@ -395,6 +406,8 @@ class Guy:
             self.state = 'defense'
             self.frame = 0
             self._dash = False
+            # 마지막 행동 시간 기록 업데이트
+            self._last_action_time['defend'] = get_time()
             return BehaviorTree.RUNNING
 
         # 방어 지속 시간 0.6
