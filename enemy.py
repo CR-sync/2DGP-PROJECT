@@ -78,7 +78,11 @@ class Guy:
 
         self._bb_template = (100, 190, 0, 0)
 
-        self.hitbox_defs = {}
+        self.hitbox_defs = {
+            'punch': [(40, 10, 60, 20, 1, 2, 'punch_fist', 5)],
+            'punch_combo1': [(50, 10, 70, 22, 1, 2, 'punch_c1_fist', 10)],
+            'punch_combo2': [(70, 10, 80, 24, 1, 2, 'punch_c2_fist', 20)],
+        }
 
         self.tx, self.ty = self.x, self.y
 
