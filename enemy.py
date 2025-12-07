@@ -127,7 +127,7 @@ class Guy:
             return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
-    def set_target_near_lucia(self,D=100):
+    def set_target_near_lucia(self,D=50):
         lucia = common.lucia
         offset = -D if self.x < lucia.x else D
         self.tx = lucia.x + offset
