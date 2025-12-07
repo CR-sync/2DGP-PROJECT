@@ -411,6 +411,9 @@ class Guy:
         a_back = Action('Backstep', self.do_backstep, 150)
         seq_back = Sequence('Close back seq', c_choice_back, a_back)
 
+        nearby_seq = Sequence('Nearby behavior', c_close, a_decide,
+                              Selector('Nearby options', seq_attack_close, seq_defend, seq_back))
+
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 3))
         a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
@@ -419,5 +422,5 @@ class Guy:
 
         a_base= Action('idle', self.set_idle)
 
-        root= Selector('Guy behavior', attack_seq,dash_seq, a_base)
+        root= Selector('Guy behavior', nearby_seq, seq_attack_close, dash_seq, a_base)
         self.bt = BehaviorTree(root)
