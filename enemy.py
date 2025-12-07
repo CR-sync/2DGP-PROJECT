@@ -79,9 +79,9 @@ class Guy:
         self._bb_template = (80, 190, 0, 0)
 
         self.hitbox_defs = {
-            'punch': [(5, 10, 20, 20, 1, 2, 'punch_fist', 5)],
-            'punch_combo1': [(5, 10, 20, 22, 1, 2, 'punch_c1_fist', 10)],
-            'punch_combo2': [(5, 10, 20, 24, 1, 2, 'punch_c2_fist', 20)],
+            'punch': [(10, 10, 20, 20, 0, 2, 'punch_fist', 5)],
+            'punch_combo1': [(10, 10, 20, 22, 0, 2, 'punch_c1_fist', 10)],
+            'punch_combo2': [(10, 10, 20, 30, 0, 2, 'punch_c2_fist', 20)],
         }
 
         self.tx, self.ty = self.x, self.y
@@ -148,9 +148,7 @@ class Guy:
         half_w, half_h, y_off, x_off = getattr(self, '_bb_template')
         w = float(half_w * 2)
         h = float(half_h * 2)
-        ox = float(x_off) * self.scale
-        oy = float(y_off) * self.scale
-        return Hurtbox(ox, oy, w * self.scale, h * self.scale, owner=self)
+        return Hurtbox(x_off, y_off, w, h, owner=self)
 
     def get_active_hitboxes(self):
         defs = self.hitbox_defs.get(self.state, [])
