@@ -365,6 +365,25 @@ class Guy:
         choice = params
         return BehaviorTree.SUCCESS if getattr(self, '_close_choice', None) == choice else BehaviorTree.FAIL
 
+    def do_defend(self):
+        if not getattr(self, '_defending', False):
+            self._defending = True
+            self._defend_start = get_time()
+            self.state = 'defense'
+            self.frame = 0
+            self._dash = False
+            return BehaviorTree.RUNNING
+
+        # 방어 지속 시간 0.6
+        if get_time() - getattr(self, '_defend_start', 0) < 0.6:
+            return BehaviorTree.RUNNING
+
+        # 종료
+        self._defending = False
+        self.state = 'IDLE'
+        self._close_choice = None
+        return BehaviorTree.SUCCESS
+
     def build_behavior_tree(self):
         # 가까운지 확인하고 행동 결정
         c_close = Condition('Lucia is close', lambda: BehaviorTree.SUCCESS if abs(self.x-common.lucia.x)<=150 else BehaviorTree.FAIL)
