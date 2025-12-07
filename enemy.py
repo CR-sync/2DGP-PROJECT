@@ -65,6 +65,11 @@ class Guy:
         self.alpha = 1.0
         self._dash = False
 
+        self._last_close_decide = None
+        self._defend_start = None
+        self._defending = None
+        self._close_choice = None
+
         self._bb_template = (30, 50, 0, 0)
 
         self.tx, self.ty = self.x, self.y
