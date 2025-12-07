@@ -551,7 +551,15 @@ class Lucia:
         right = int(self.x +x_off + half_w)
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
-    
+
+    # Hurtbox: 몸통 허트박스 반환 (월드 크기로 변환)
+    def get_current_hurtbox(self):
+        half_w, half_h, y_off, x_off = getattr(self, '_bb_template', (40, 80, 0, 0))
+        w = half_w * 2
+        h = half_h * 2
+        # _bb_template의 x_off/y_off는 이미 월드 오프셋이므로 그대로 사용
+        return Hurtbox(x_off, y_off, w, h, owner=self)
+
     def clamp_within_screen(self, screen_w=None):
         if screen_w is None:
             screen_w = globals().get('SCREEN_WIDTH', 1200)
