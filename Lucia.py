@@ -64,6 +64,7 @@ LuciaSprite={
 }
 
 from pico2d import load_image, get_time,draw_rectangle
+from hitbox import Hitbox, Hurtbox
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_UP, SDLK_s
 from state_machine import StateMachine
 import math
@@ -378,6 +379,10 @@ class JumpKick:
 class Lucia:
     def __init__(self):
         self.x, self.y = 220, 190
+        # HP 및 무적 타이머
+        self.hp = 100
+        self._invulnerable_until = 0.0
+
         self.base_y = self.y
         self.facing = 1
         self.is_backstep = False
@@ -414,6 +419,14 @@ class Lucia:
             'kick': (40, 40, 50, 120),
             'kick_combo1': (40, 140, 25, 100),
             'kick_combo2': (80, 40, 30, 100)
+        }
+
+        # (offset_x, offset_y, w, h, start_frame, end_frame, tag, damage)
+        self.hitbox_defs = {
+            'kick': [],
+            'kick_combo1': [],
+            'kick_combo2': [],
+            'jump_kick': [],
         }
 
         for st in (self.IDLE, self.WALK, self.SIT, self.KICK, self.KICK_COMBO1,
@@ -547,3 +560,4 @@ class Lucia:
 
         if right > screen_w:
             self.x += (screen_w - right)
+
