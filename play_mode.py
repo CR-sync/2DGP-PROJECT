@@ -42,7 +42,15 @@ def update():
 
     for hitbox, hurtbox in hits:
         # hitbox.owner 이 공격자, hurtbox.owner 이 피격자
-        hurtbox.owner.hp -= hitbox.damage
+        victim = hurtbox.owner
+        attacker = hitbox.owner
+        print(f"[COLLISION] {attacker.__class__.__name__}.{getattr(attacker, 'state', '')} -> {victim.__class__.__name__}.{getattr(victim, 'state', '')} dmg={hitbox.damage}")
+        # 가능한 경우 on_hit을 호출해 무적 로직을 활용
+        if hasattr(victim, 'on_hit') and callable(getattr(victim, 'on_hit')):
+            victim.on_hit(hitbox.damage)
+        else:
+            # fallback
+            victim.hp -= hitbox.damage
 
 def draw():
     clear_canvas()
