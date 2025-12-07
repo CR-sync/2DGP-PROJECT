@@ -65,7 +65,7 @@ class Guy:
         self.alpha = 1.0
         self._dash = False
 
-        self._last_close_decide = None
+        self._last_close_decide =0
         self._defend_start = None
         self._defending = None
         self._close_choice = None
@@ -127,7 +127,7 @@ class Guy:
             return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
-    def set_target_near_lucia(self,D=200):
+    def set_target_near_lucia(self,D=100):
         lucia = common.lucia
         offset = -D if self.x < lucia.x else D
         self.tx = lucia.x + offset
@@ -144,6 +144,7 @@ class Guy:
             self._dash=False
             self.x=self.tx
             self._run_ended_time = get_time()
+            self._last_close_decide = 0
             return BehaviorTree.SUCCESS
 
         dir_x = 1 if dx > 0 else -1
@@ -362,7 +363,7 @@ class Guy:
         elif r < p_attack + p_defend:
             self._close_choice = 'defend'
         else:
-            self._close_choice = 'backstep'
+            self._close_choice = 'back'
 
         return BehaviorTree.SUCCESS
 
@@ -416,11 +417,11 @@ class Guy:
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 3))
-        a_set = Action('Set dash target near lucia', self.set_target_near_lucia)
-        a_dash = Action('Dash move to lucia', self.move_to, 200)
+        a_set = Action('Set dash target near lucia', self.set_target_near_lucia,100)
+        a_dash = Action('Dash move to lucia', self.move_to, 100)
         dash_seq = Sequence('Dash to lucia if far', c1, c2, a_set, a_dash)
 
         a_base= Action('idle', self.set_idle)
 
-        root= Selector('Guy behavior', nearby_seq, seq_attack_close, dash_seq, a_base)
+        root= Selector('Guy behavior', nearby_seq, dash_seq, a_base)
         self.bt = BehaviorTree(root)
