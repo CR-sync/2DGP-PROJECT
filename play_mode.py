@@ -2,6 +2,8 @@ from pico2d import *
 from Lucia import Lucia
 import game_world
 import game_framework
+from enemy import Guy
+from hitbox import check_collisions
 # import title_mode
 # import item_mode
 
@@ -20,15 +22,27 @@ def handle_events():
 
 
 def init():
-    global lucia
+    global lucia, guy
 
     lucia = Lucia()
+    guy=Guy()
     game_world.add_object(lucia, 1)
+    game_world.add_object(guy,1)
 
+    game_world.add_collision_pair('lucia:guy', lucia, guy)
 
 def update():
     game_world.update()
+    lucia_hits = lucia.get_active_hitboxes()
+    enemy_hits = guy.get_active_hitboxes()
+    lucia_hurt = lucia.get_current_hurtbox()
+    enemy_hurt = guy.get_current_hurtbox()
 
+    hits = check_collisions(lucia_hits + enemy_hits, [lucia_hurt, enemy_hurt], frame=int(lucia.frame))
+
+    for hitbox, hurtbox in hits:
+        # hitbox.owner 이 공격자, hurtbox.owner 이 피격자
+        hurtbox.owner.hp -= hitbox.damage
 
 def draw():
     clear_canvas()
