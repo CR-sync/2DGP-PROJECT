@@ -65,7 +65,12 @@ class Guy:
         self.alpha = 1.0
         self._dash = False
 
-        self._last_close_decide =0
+        self._last_close_decide = 0.0
+        self._decision_cooldown = 0.35  # 기본 결정 쿨타임
+        # 행동별 쿨타임 (초)
+        self._action_cooldowns = {'attack': 0.8, 'defend': 0.6, 'back': 1.0}
+        self._last_action_time = {'attack': 0.0, 'defend': 0.0, 'back': 0.0}
+
         self._defend_start = None
         self._defending = None
         self._close_choice = None
@@ -127,7 +132,7 @@ class Guy:
             return BehaviorTree.SUCCESS
         return BehaviorTree.FAIL
 
-    def set_target_near_lucia(self,D=50):
+    def set_target_near_lucia(self,D=100):
         lucia = common.lucia
         offset = -D if self.x < lucia.x else D
         self.tx = lucia.x + offset
@@ -264,7 +269,7 @@ class Guy:
                 print('[DBG] combo_chain: start punch_combo1')
                 return BehaviorTree.RUNNING
             else:
-                # 콤보 없음
+                #콤보 없음
                 return BehaviorTree.SUCCESS
 
         # 콤보1 진행 중
@@ -344,26 +349,38 @@ class Guy:
         return BehaviorTree.RUNNING
 
     def decide_close_action(self):
-        # 짧은 재결정 쿨다운
         now = get_time()
-        if getattr(self, '_last_close_decide', 0) + 0.25 > now and getattr(self, '_close_choice', None):
+        last_decide = getattr(self, '_last_close_decide', 0) or 0
+        if last_decide + getattr(self, '_decision_cooldown', 0.35) > now and getattr(self, '_close_choice', None):
             return BehaviorTree.SUCCESS
         self._last_close_decide = now
 
-        # 확률
-        p_attack = 0.5
-        p_defend = 0.2
-        p_back = 0.3
+        # 기본 가중치
+        base_probs = {'attack': 0.5, 'defend': 0.2, 'back': 0.3}
 
-        # 정규화 후 샘플링
-        total = p_attack + p_defend + p_back
+        # 사용 가능한 행동만 후보에 추가 (쿨타임이 끝난 것)
+        candidates = []
+        weights = []
+        for name, prob in base_probs.items():
+            last_time = self._last_action_time.get(name, 0.0)
+            cd = self._action_cooldowns.get(name, 0.0)
+            if now >= last_time + cd:
+                candidates.append(name)
+                weights.append(prob)
+
+        if not candidates:
+            # 모든 행동이 쿨다운 중이면 선택을 비워두고 성공 반환
+            self._close_choice = None
+            return BehaviorTree.SUCCESS
+
+        # 가중 샘플링
+        total = sum(weights)
         r = random.random() * total
-        if r < p_attack:
-            self._close_choice = 'attack'
-        elif r < p_attack + p_defend:
-            self._close_choice = 'defend'
-        else:
-            self._close_choice = 'back'
+        cum = 0.0
+        for i, w in enumerate(weights):
+            cum += w
+                self._close_choice = candidates[i]
+                break
 
         return BehaviorTree.SUCCESS
 
