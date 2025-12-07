@@ -399,6 +399,12 @@ class Guy:
         # 방어 시퀀스
         c_choice_defend = Condition('choice==defend', self.close_choice_is, 'defend')
         a_defend = Action('Defend', self.do_defend)
+        seq_defend = Sequence('Close defend seq', c_choice_defend, a_defend)
+
+        # 도망(백스텝) 시퀀스
+        c_choice_back = Condition('choice==back', self.close_choice_is, 'back')
+        a_back = Action('Backstep', self.do_backstep, 150)
+        seq_back = Sequence('Close back seq', c_choice_back, a_back)
 
         c1 = Condition('Lucia far on x?', self.lucia_far_x, 500)
         c2 = Condition('far time', self.lucia_far_for, (500, 3))
