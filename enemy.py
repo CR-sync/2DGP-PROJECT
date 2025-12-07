@@ -140,6 +140,14 @@ class Guy:
         top = int(self.y + half_h + y_off)
         return left, bottom, right, top
 
+    def get_current_hurtbox(self):
+        half_w, half_h, y_off, x_off = getattr(self, '_bb_template', (30, 50, 0, 0))
+        w = float(half_w * 2)
+        h = float(half_h * 2)
+        ox = float(x_off) * self.scale
+        oy = float(y_off) * self.scale
+        return Hurtbox(ox, oy, w * self.scale, h * self.scale, owner=self)
+
     def lucia_far_x(self, distance):
         lucia = common.lucia
         if lucia is None:
