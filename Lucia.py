@@ -423,10 +423,11 @@ class Lucia:
 
         # (offset_x, offset_y, w, h, start_frame, end_frame, tag, damage)
         self.hitbox_defs = {
-            'kick': (40, 40, 50, 120),
-            'kick_combo1': (40, 140, 25, 100),
-            'kick_combo2': (80, 40, 30, 100),
-            'jump_kick': (40, 50, -130, 120),
+            'kick':[(30, -10, 40, 20, 1, 1, 'kick_foot', 3)],
+            'kick_combo1': [(35, -5, 46, 22, 0, 1, 'kick_combo1_foot', 4)],
+            'kick_combo2': [(40, 0, 52, 26, 0, 2, 'kick_combo2_foot', 5)],
+            'jump_kick': [(0, -30, 60, 30, 0, 0, 'jump_kick', 6)],
+            'punch': [(20, 40, 30, 20, 0, 0, 'punch_hand', 2)]
         }
 
         for st in (self.IDLE, self.WALK, self.SIT, self.KICK, self.KICK_COMBO1,
