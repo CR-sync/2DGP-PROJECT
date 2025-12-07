@@ -337,6 +337,30 @@ class Guy:
 
         return BehaviorTree.RUNNING
 
+    def decide_close_action(self):
+        # 짧은 재결정 쿨다운
+        now = get_time()
+        if getattr(self, '_last_close_decide', 0) + 0.25 > now and getattr(self, '_close_choice', None):
+            return BehaviorTree.SUCCESS
+        self._last_close_decide = now
+
+        # 확률
+        p_attack = 0.5
+        p_defend = 0.2
+        p_back = 0.3
+
+        # 정규화 후 샘플링
+        total = p_attack + p_defend + p_back
+        r = random.random() * total
+        if r < p_attack:
+            self._close_choice = 'attack'
+        elif r < p_attack + p_defend:
+            self._close_choice = 'defend'
+        else:
+            self._close_choice = 'backstep'
+
+        return BehaviorTree.SUCCESS
+
     def build_behavior_tree(self):
         # 가까운지 확인하고 행동 결정
         c_close = Condition('Lucia is close', lambda: BehaviorTree.SUCCESS if abs(self.x-common.lucia.x)<=150 else BehaviorTree.FAIL)
