@@ -536,6 +536,14 @@ class Lucia:
         self.state_machine.draw()
         draw_rectangle(*self.get_bb())
 
+        #(몸통)
+        hurt = self.get_current_hurtbox()
+        draw_rectangle(*hurt.world_rect_for())
+
+        # (손/발)
+        for hb in self.get_active_hitboxes():
+            draw_rectangle(*hb.world_rect_for(int(self.frame)))
+
     def get_bb(self):
         half_w, half_h, y_off, x_off = self._bb_template
         left = int(self.x + x_off - half_w)
