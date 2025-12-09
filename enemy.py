@@ -503,25 +503,52 @@ class Guy:
 
         root= Selector('Guy behavior', nearby_seq, dash_seq, a_base)
         self.bt = BehaviorTree(root)
+        self.bt = BehaviorTree(root)
 
     def _clamp_to_hurtbox_screen(self):
+        # 안정화된 클램프: hurtbox가 있으면 그것 기준, 없으면 get_bb() 기준으로 left/right 사용
+        canvas_w = get_canvas_width()
+
+        # get left/right safely
         hurt = self.get_current_hurtbox()
         if hurt is not None:
+            # world_rect_for may accept frame or not depending on implementation
             try:
-                left, bottom, right, top = hurt.world_rect_for()
+                l, b, r, t = hurt.world_rect_for(int(self.frame))
             except TypeError:
-                left, bottom, right, top = hurt.world_rect_for(int(self.frame))
+                try:
+                    l, b, r, t = hurt.world_rect_for()
+                except Exception:
+                    l, b, r, t = self.get_bb()
         else:
-            # get_bb()는 int 좌표를 반환하므로 그대로 사용
-            left, bottom, right, top = self.get_bb()
+            l, b, r, t = self.get_bb()
 
-        canvas_w = get_canvas_width()
-        # 왼쪽이 화면 밖이면 오른쪽으로 이동
-        if left < 0:
-            self.x += (0 - left)
-        # 오른쪽이 화면 밖이면 왼쪽으로 이동
-        if right > canvas_w:
-            self.x -= (right - canvas_w)
+        left = float(l)
+        right = float(r)
 
-        # self.x를 float로 유지
-        self.x = float(self.x)
+        dx = 0.0
+        if left < 0.0:
+            dx = -left
+        elif right > float(canvas_w):
+            dx = float(canvas_w) - right
+
+        if abs(dx) > 0.0:
+            # self.x 보정
+            self.x += dx
+            # 이동 목표도 함께 보정하여 다음 틱에 목표로 인해 다시 화면 밖으로 밀려나는 것을 방지
+            if hasattr(self, 'tx') and isinstance(self.tx, (int, float)):
+                try:
+                    self.tx += dx
+                except Exception:
+                    pass
+            if hasattr(self, '_backstep_target') and isinstance(self._backstep_target, (int, float)):
+                try:
+                    self._backstep_target += dx
+                except Exception:
+                    pass
+
+        # 안전 변환
+        try:
+            self.x = float(self.x)
+        except Exception:
+            self.x = max(0.0, min(float(canvas_w), getattr(self, 'x', 0.0)))
