@@ -102,6 +102,14 @@ class Guy:
         # hurtbox 기준으로 화면 밖으로 나가지 않도록 위치 보정 (루시아와 동일 처리)
         self._clamp_to_hurtbox_screen()
 
+        # facing 업데이트
+        lucia = getattr(common, 'lucia', None)
+        if lucia is not None:
+            try:
+                self.facing = 1 if lucia.x > self.x else -1
+            except Exception:
+                pass
+
     def draw(self):
         frames = GuySprite.get(self.state, [])
         if frames:
@@ -512,14 +520,10 @@ class Guy:
         # get left/right safely
         hurt = self.get_current_hurtbox()
         if hurt is not None:
-            # world_rect_for may accept frame or not depending on implementation
             try:
-                l, b, r, t = hurt.world_rect_for(int(self.frame))
-            except TypeError:
-                try:
-                    l, b, r, t = hurt.world_rect_for()
-                except Exception:
-                    l, b, r, t = self.get_bb()
+                l, b, r, t = hurt.world_rect_for()
+            except Exception:
+                l, b, r, t = self.get_bb()
         else:
             l, b, r, t = self.get_bb()
 
