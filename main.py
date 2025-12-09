@@ -39,7 +39,22 @@ def draw_action(action: str, i: int, x: int = 400, y: int = 300, scale: float = 
     except Exception:
         pass
 
-    character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
+    # lucia 인스턴스가 있으면 facing을 참고해 좌우 반전 적용
+    try:
+        import common
+        lucia_obj = getattr(common, 'lucia', None)
+        facing = getattr(lucia_obj, 'facing', 1) if lucia_obj is not None else 1
+    except Exception:
+        facing = 1
+
+    if facing == -1:
+        # 좌우 반전해서 그리기
+        try:
+            character.clip_composite_draw(src_x1, src_bottom, src_w, src_h, 0, 'h', draw_x, draw_y, dst_w, dst_h)
+        except Exception:
+            character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
+    else:
+        character.clip_draw(src_x1, src_bottom, src_w, src_h, draw_x, draw_y, dst_w, dst_h)
 
 
 running = True
