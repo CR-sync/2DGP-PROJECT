@@ -131,13 +131,18 @@ class Guy:
             else:
                 self.image.clip_draw(src_x1, src_bottom, src_w, src_h, self.x, self.y, dst_w, dst_h)
 
-        # 기본 바운딩 박스(몸통) 그리기
-        draw_rectangle(*self.get_bb())
-
-        # (몸통)
         hurt = self.get_current_hurtbox()
+        hurt_rect = None
         if hurt is not None:
-            draw_rectangle(*hurt.world_rect_for())
+            try:
+                hurt_rect = hurt.world_rect_for()
+            except Exception:
+                hurt_rect = None
+
+        if hurt_rect is not None:
+            draw_rectangle(*hurt_rect)
+        else:
+            draw_rectangle(*self.get_bb())
 
         for hb in self.get_active_hitboxes():
             draw_rectangle(*hb.world_rect_for(int(self.frame)))
