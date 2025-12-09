@@ -69,6 +69,7 @@ from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_DOWN, SDLK_
 from state_machine import StateMachine
 import math
 from combo_manager import ComboManager
+import common
 import game_world
 import game_framework
 
@@ -513,6 +514,14 @@ class Lucia:
         self.state_machine.update()
         self.clamp_within_screen()
 
+        guy = getattr(common, 'guy', None)
+        if guy is not None and hasattr(guy, 'x'):
+            # 같은 x 좌표일 경우 기존 facing을 유지
+            if guy.x > self.x:
+                self.facing = 1
+            elif guy.x < self.x:
+                self.facing = -1
+
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
             self.last_input_dir = 1
@@ -534,11 +543,22 @@ class Lucia:
 
     def draw(self):
         self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
 
         #(몸통)
         hurt = self.get_current_hurtbox()
-        draw_rectangle(*hurt.world_rect_for())
+        hurt_rect = None
+        if hurt is not None:
+            try:
+                hurt_rect = hurt.world_rect_for()
+            except Exception:
+                hurt_rect = None
+
+        if hurt_rect is not None:
+            # 허트박스를 우선 그립니다.
+            draw_rectangle(*hurt_rect)
+        else:
+            # 허트박스가 없으면 기존의 bb를 그립니다.
+            draw_rectangle(*self.get_bb())
 
         # (손/발)
         for hb in self.get_active_hitboxes():
@@ -599,4 +619,3 @@ class Lucia:
             self.hp -= damage
             print(f"Lucia got hit! HP: {self.hp}")
             self._invulnerable_until = current_time + 1.0  # 1초간 무적
-
