@@ -70,8 +70,7 @@ from state_machine import StateMachine
 import math
 from combo_manager import ComboManager
 import common
-import game_world
-import game_framework
+
 
 def right_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
@@ -325,7 +324,11 @@ class JumpKick:
         self._x0 = float(self.lucia.x)
         self._y0 = float(self.lucia.y)
 
-        self._dir = self.lucia.dir or 1
+        # 진행 방향을 진입 시점의 facing으로 고정
+        self._dir = getattr(self.lucia, 'facing', None) or (self.lucia.dir or 1)
+        # facing 변경을 잠금
+        self.lucia._lock_facing = True
+        self.lucia._locked_facing = self._dir
 
         base_y = getattr(self.lucia, 'base_y', self._y0)
         self._r = max(1.0, base_y - self._y0)
@@ -340,6 +343,15 @@ class JumpKick:
 
     def exit(self, e):
         self._active = False
+        # 점프킥 종료 시 facing 잠금 해제
+        self.lucia._lock_facing = False
+        # 필요하면 잠금된 facing을 현재 facing으로 적용
+        if hasattr(self.lucia, '_locked_facing'):
+            self.lucia.facing = getattr(self.lucia, '_locked_facing')
+            try:
+                delattr(self.lucia, '_locked_facing')
+            except Exception:
+                pass
 
     def do(self):
         self._left -= 1
@@ -382,6 +394,7 @@ class Lucia:
         self.x, self.y = 220, 190
         # HP 및 무적 타이머
         self.hp = 100
+        self.max_hp = 100
         self._invulnerable_until = 0.0
 
         self.base_y = self.y
@@ -401,6 +414,9 @@ class Lucia:
         self.sprites = LuciaSprite
         self.dir = 1
         self.down_pressed = False
+
+        # facing 잠금 관련 초기화
+        self._lock_facing = False
 
         self.IDLE = Idle(self)
         self.WALK = Walk(self)
@@ -516,11 +532,15 @@ class Lucia:
 
         guy = getattr(common, 'guy', None)
         if guy is not None and hasattr(guy, 'x'):
-            # 같은 x 좌표일 경우 기존 facing을 유지
-            if guy.x > self.x:
-                self.facing = 1
-            elif guy.x < self.x:
-                self.facing = -1
+            # 방향이 잠겨있다면 갱신하지 않음
+            if getattr(self, '_lock_facing', False):
+                pass
+            else:
+                # 같은 x 좌표일 경우 기존 facing을 유지
+                if guy.x > self.x:
+                    self.facing = 1
+                elif guy.x < self.x:
+                    self.facing = -1
 
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
@@ -569,7 +589,7 @@ class Lucia:
         left = int(self.x + x_off - half_w)
         bottom = int(self.y - half_h + y_off)
         right = int(self.x +x_off + half_w)
-        top = int(self.y + half_h + y_off)
+        top = int(self.y + half_w + y_off)
         return left, bottom, right, top
 
     # Hurtbox: 몸통 허트박스 반환 (월드 크기로 변환)
@@ -617,5 +637,8 @@ class Lucia:
         current_time = get_time()
         if current_time >= self._invulnerable_until:  # 무적 시간이 아닐 때만 피해를 받음
             self.hp -= damage
+            # HP가 음수가 되지 않도록 클램프
+            if self.hp < 0:
+                self.hp = 0
             print(f"Lucia got hit! HP: {self.hp}")
             self._invulnerable_until = current_time + 1.0  # 1초간 무적
