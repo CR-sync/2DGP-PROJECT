@@ -4,6 +4,10 @@ import game_world
 import game_framework
 from enemy import Guy
 from hitbox import check_collisions
+
+# 모듈 레벨 전역 변수 선언(정적 분석기 경고 제거용)
+lucia = None
+guy = None
 # import title_mode
 # import item_mode
 

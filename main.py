@@ -1,6 +1,7 @@
 from pico2d import *
-from Lucia import Lucia, LuciaSprite
-from enemy import Guy, GuySprite
+from Lucia import LuciaSprite
+import play_mode
+import game_world
 import common
 import time
 import game_framework
@@ -71,16 +72,16 @@ def handle_events():
         else:
             lucia.handle_event(event)
 
-lucia = Lucia()
-common.lucia=lucia
+play_mode.init()
+lucia = play_mode.lucia
+guy = play_mode.guy
+common.lucia = lucia
+common.guy = guy
 LuciaX, LuciaY = lucia.x, lucia.y
 frame = 0
 frame_count = max(len(LuciaSprite.get(state, [])), 1)
 delay_time = 0.14
 lucia.draw_action = draw_action
-
-guy = Guy()
-common.guy=guy
 guy.facing = -1
 
 prev_time = time.time()
@@ -95,8 +96,8 @@ while running:
     if not running:
         break
 
-    lucia.update()
-    guy.update()
+    # 게임 상태 업데이트 및 충돌 처리(모두 play_mode에서 처리)
+    play_mode.update()
 
     clear_canvas()
     background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
@@ -104,12 +105,34 @@ while running:
     x1, y1 = 13, 15
     x2, y2 = 342, 31
 
+    # 배경 HP 바(전체)
     HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
-    HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, x2 - x1, y2 - y1, 600, 550, (x2 - x1) * 3, (y2 - y1) * 3)
 
+    # 전경 HP 바는 Lucia의 현재 hp에 비례 자름
+    try:
+        hp = max(0, getattr(lucia, 'hp', 0))
+        max_hp = getattr(lucia, 'max_hp', 100)
+        frac = float(hp) / float(max_hp) if max_hp > 0 else 0.0
+    except Exception:
+        frac = 0.0
 
-    lucia.draw()
-    guy.draw()
+    full_src_w = x2 - x1
+    full_src_h = y2 - y1
+    src_w = max(1, int(full_src_w * frac))
+
+    # 원래 전체 바의 목적지 너비/왼쪽 위치 계산(기존 코드와 정렬 동일하게 유지)
+    full_dst_w = full_src_w * 3
+    full_dst_h = full_src_h * 3
+    left = 600 - (full_dst_w / 2)
+
+    # 잘린 전경 바의 목적지 너비 및 중심 위치(왼쪽 정렬 유지)
+    dst_w = src_w * 3
+    dst_h = full_dst_h
+    dst_x = left + (dst_w / 2)
+
+    HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, src_w, full_src_h, dst_x, 545, dst_w, dst_h)
+
+    game_world.render()
 
     update_canvas()
 
