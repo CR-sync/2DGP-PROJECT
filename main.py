@@ -250,7 +250,8 @@ while running:
                 LOSE_IMG.clip_draw(0, 0, LOSE_IMG.w, LOSE_IMG.h, get_canvas_width()//2, get_canvas_height()//2, LOSE_IMG.w/2, LOSE_IMG.h/2)
 
             if round_show_time >= round_show_duration:
-                pass
+                running=False
+                break
     except Exception as e:
         print(f"Round overlay error: {e}")
 
