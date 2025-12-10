@@ -22,8 +22,16 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(400, 300)
+    w = get_canvas_width()
+    h = get_canvas_height()
+
+    img_w = getattr(image, 'w', None)
+    img_h = getattr(image, 'h', None)
+    if img_w is not None and img_h is not None:
+        image.draw(w // 2, h // 2, img_w * 3, img_h * 3)
+
     update_canvas()
+
 def handle_events():
     # 현재 이벤트들을 소비
     events = get_events()

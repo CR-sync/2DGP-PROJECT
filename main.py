@@ -5,8 +5,11 @@ import game_world
 import common
 import time
 import game_framework
+import TITLE_mode
 
 open_canvas(1200, 700)
+
+game_framework.run(TITLE_mode)
 
 background = load_image('background.png')
 character = load_image('LuciaSprite.png')
