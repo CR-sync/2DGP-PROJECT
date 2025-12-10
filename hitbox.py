@@ -48,7 +48,7 @@ class Hurtbox(Box):
         self.tag = tag
 
     def world_rect_for(self):
-        return self.world_rect(self.owner.x, self.owner.y, 1)
+        return self.world_rect(self.owner.x, self.owner.y, getattr(self.owner, 'facing', 1))
 
 
 def check_collisions(hitboxes, hurtboxes, frame):
