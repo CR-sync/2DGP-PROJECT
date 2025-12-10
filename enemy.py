@@ -52,6 +52,10 @@ from hitbox import Hitbox, Hurtbox
 class Guy:
     def __init__(self):
         self.x, self.y = 1000, 195
+        # HP 및 무적 타이머
+        self.hp = 100
+        self.max_hp = 100
+        self._invulnerable_until = 0.0
         self._backstepping = False
         self._backstep_target = float(self.x)
         self.facing = 1
@@ -182,6 +186,19 @@ class Guy:
                 active.append(hb)
 
         return active
+
+    # 히트 처리 메서드 추가
+    def on_hit(self, damage):
+        current_time = get_time()
+        if current_time >= getattr(self, '_invulnerable_until', 0.0):
+            try:
+                self.hp -= damage
+            except Exception:
+                pass
+            if getattr(self, 'hp', 0) < 0:
+                self.hp = 0
+            print(f"Guy got hit! HP: {getattr(self, 'hp', '?')}")
+            self._invulnerable_until = current_time + 0.8  # 0.8초 무적
 
     def lucia_far_x(self, distance):
         lucia = common.lucia
