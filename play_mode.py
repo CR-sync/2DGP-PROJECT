@@ -79,6 +79,22 @@ def update():
                     victim.hp -= hitbox.damage
                 except Exception as e:
                     print(f"Error applying damage: {e}")
+        # 누가 피해를 입혔는지 기록 (UI에서 방향 기반 감소를 위해 사용)
+        try:
+            victim.last_hurt_by = attacker.__class__.__name__
+            # 공격자 종류에 따라 감소 방향 결정: Lucia가 공격하면 오른쪽에서 줄어들게, Guy가 공격하면 왼쪽에서 줄어들게
+            try:
+                if isinstance(attacker, Lucia):
+                    victim.last_hurt_from = 'right'
+                elif isinstance(attacker, Guy):
+                    victim.last_hurt_from = 'left'
+                else:
+                    # fallback: 위치 기반 판정
+                    victim.last_hurt_from = 'left' if getattr(attacker, 'x', 0) < getattr(victim, 'x', 0) else 'right'
+            except Exception:
+                victim.last_hurt_from = None
+        except Exception:
+            pass
 
 def draw():
     clear_canvas()
