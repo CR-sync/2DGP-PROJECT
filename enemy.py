@@ -160,11 +160,7 @@ class Guy:
         return left, bottom, right, top
 
     def get_current_hurtbox(self):
-        active_states = {'punch', 'punch_combo1', 'punch_combo2'}
-        if self.state not in active_states:
-            return None
-
-        half_w, half_h, y_off, x_off = getattr(self, '_bb_template')
+        half_w, half_h, y_off, x_off = getattr(self, '_bb_template', (80, 190, 0, 0))
         w = float(half_w * 2)
         h = float(half_h * 2)
         return Hurtbox(x_off, y_off, w, h, owner=self)
