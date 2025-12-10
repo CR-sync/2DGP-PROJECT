@@ -100,6 +100,12 @@ delay_time = 0.14
 lucia.draw_action = draw_action
 guy.facing = -1
 
+# 이전 HP 추적
+prev_lucia_hp = getattr(lucia, 'hp', None)
+prev_guy_hp = getattr(guy, 'hp', None)
+prev_lucia_hurt_from = getattr(lucia, 'last_hurt_from', None)
+prev_guy_hurt_from = getattr(guy, 'last_hurt_from', None)
+
 prev_time = time.time()
 
 while running:
@@ -159,6 +165,16 @@ while running:
     lucia_dst_center_x = left_dst_edge + left_half_dst_w - (lucia_dst_w / 2)
     HP_bar_up.clip_draw(int(lucia_src_x), HP_bar_up.h - y2, int(lucia_src_w), full_src_h, lucia_dst_center_x, center_y, lucia_dst_w, lucia_dst_h)
 
+    # 앞쪽
+    try:
+        l_left = lucia_dst_center_x - (lucia_dst_w / 2)
+        l_right = lucia_dst_center_x + (lucia_dst_w / 2)
+        l_bottom = center_y - (lucia_dst_h / 2)
+        l_top = center_y + (lucia_dst_h / 2)
+        draw_rectangle(int(l_left), int(l_bottom), int(l_right), int(l_top))
+    except Exception:
+        pass
+
     # Guy (오른쪽 반): 왼쪽(중앙) 쪽에서 줄어들도록 그리기
     try:
         guy_hp = max(0, getattr(guy, 'hp', 100))
@@ -176,6 +192,32 @@ while running:
     guy_dst_center_x = right_half_left + (guy_dst_w / 2)
     HP_bar_up.clip_draw(int(guy_src_x), HP_bar_up.h - y2, int(guy_src_w), full_src_h, guy_dst_center_x, center_y, guy_dst_w, guy_dst_h)
 
+    # 가이쪽
+    try:
+        g_left = guy_dst_center_x - (guy_dst_w / 2)
+        g_right = guy_dst_center_x + (guy_dst_w / 2)
+        g_bottom = center_y - (guy_dst_h / 2)
+        g_top = center_y + (guy_dst_h / 2)
+        draw_rectangle(int(g_left), int(g_bottom), int(g_right), int(g_top))
+    except Exception:
+        pass
+
+    # hp 값 변경 시 출력
+    try:
+        cur_lucia_hp = getattr(lucia, 'hp', None)
+        cur_guy_hp = getattr(guy, 'hp', None)
+        cur_lucia_hf = getattr(lucia, 'last_hurt_from', None)
+        cur_guy_hf = getattr(guy, 'last_hurt_from', None)
+        if cur_lucia_hp != prev_lucia_hp or cur_guy_hp != prev_guy_hp or cur_lucia_hf != prev_lucia_hurt_from or cur_guy_hf != prev_guy_hurt_from:
+            print(f"[HP DEBUG] Lucia HP={cur_lucia_hp} (src_w={lucia_src_w}), Guy HP={cur_guy_hp} (src_w={guy_src_w}), lucia.hurt_from={cur_lucia_hf}, guy.hurt_from={cur_guy_hf}")
+            prev_lucia_hp = cur_lucia_hp
+            prev_guy_hp = cur_guy_hp
+            prev_lucia_hurt_from = cur_lucia_hf
+            prev_guy_hurt_from = cur_guy_hf
+    except Exception as e:
+        print(f"[HP DEBUG] exception: {e}")
+
+    # 이후 UI(HP 바)와 디버그 사각형을 그려 최상단에 표시
     update_canvas()
 
     delay(delay_time)
