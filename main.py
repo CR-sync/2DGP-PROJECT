@@ -12,6 +12,13 @@ background = load_image('background.png')
 character = load_image('LuciaSprite.png')
 HP_bar_down = load_image('font.png')
 HP_bar_up = load_image('font.png')
+WIN_IMG = load_image('win.png')
+LOSE_IMG = load_image('lose.png')
+
+round_over = False
+round_result = None  # 'LUCIA_WIN' or 'LUCIA_LOSE'
+round_show_time = 0.0
+round_show_duration = 3.0
 
 state = "IDLE"
 
@@ -76,13 +83,13 @@ def handle_events():
                 if event.type == SDL_KEYDOWN and getattr(event, 'key', None) == SDLK_1:
                     print('[DEBUG] Test: apply 10 dmg to Guy')
                     try:
-                        guy.on_hit(10)
+                        guy.on_hit(60)
                     except Exception as e:
                         print(f'[DEBUG] guy.on_hit exception: {e}')
                 elif event.type == SDL_KEYDOWN and getattr(event, 'key', None) == SDLK_2:
                     print('[DEBUG] Test: apply 10 dmg to Lucia')
                     try:
-                        lucia.on_hit(10)
+                        lucia.on_hit(60)
                     except Exception as e:
                         print(f'[DEBUG] lucia.on_hit exception: {e}')
             except Exception:
@@ -119,7 +126,10 @@ while running:
         break
 
     # 게임 상태 업데이트 및 충돌 처리(모두 play_mode에서 처리)
-    play_mode.update()
+    if not round_over:
+        play_mode.update()
+    else:
+        round_show_time += game_framework.frame_time if hasattr(game_framework, 'frame_time') else 0.0
 
     clear_canvas()
     background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
@@ -216,6 +226,30 @@ while running:
             prev_guy_hurt_from = cur_guy_hf
     except Exception as e:
         print(f"[HP DEBUG] exception: {e}")
+
+    try:
+        if not round_over:
+            if getattr(guy, 'hp', 1) <= 0:
+                round_over = True
+                round_result = 'LUCIA_WIN'
+                round_show_time = 0.0
+            elif getattr(lucia, 'hp', 1) <= 0:
+                round_over = True
+                round_result = 'LUCIA_LOSE'
+                round_show_time = 0.0
+
+        if round_over:
+            draw_rectangle(0, 0, get_canvas_width(), get_canvas_height())
+
+            if round_result == 'LUCIA_WIN':
+                WIN_IMG.draw(get_canvas_width()/2, get_canvas_height()/2, WIN_IMG.w/2, WIN_IMG.h/2)
+            else:
+                LOSE_IMG.clip_draw(0, 0, LOSE_IMG.w, LOSE_IMG.h, get_canvas_width()//2, get_canvas_height()//2, LOSE_IMG.w/2, LOSE_IMG.h/2)
+
+            if round_show_time >= round_show_duration:
+                pass
+    except Exception as e:
+        print(f"Round overlay error: {e}")
 
     # 이후 UI(HP 바)와 디버그 사각형을 그려 최상단에 표시
     update_canvas()
