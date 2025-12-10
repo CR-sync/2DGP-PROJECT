@@ -102,37 +102,63 @@ while running:
     clear_canvas()
     background.clip_draw(0, 0, background.w, background.h, 600, 350, background.w * 1.9, background.h * 1.9)
 
+    # 게임 오브젝트 먼저 렌더(캐릭터/적 등)
+    game_world.render()
+
+    # 단일 HP 바(가운데) — 이미지를 좌/우 반으로 나눠 왼쪽은 Lucia, 오른쪽은 Guy 표시
     x1, y1 = 13, 15
     x2, y2 = 342, 31
-
-    # 배경 HP 바(전체)
-    HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
-
-    # 전경 HP 바는 Lucia의 현재 hp에 비례 자름
-    try:
-        hp = max(0, getattr(lucia, 'hp', 0))
-        max_hp = getattr(lucia, 'max_hp', 100)
-        frac = float(hp) / float(max_hp) if max_hp > 0 else 0.0
-    except Exception:
-        frac = 0.0
-
     full_src_w = x2 - x1
     full_src_h = y2 - y1
-    src_w = max(1, int(full_src_w * frac))
-
-    # 원래 전체 바의 목적지 너비/왼쪽 위치 계산(기존 코드와 정렬 동일하게 유지)
     full_dst_w = full_src_w * 3
     full_dst_h = full_src_h * 3
-    left = 600 - (full_dst_w / 2)
+    center_x = 600
+    center_y = 545
 
-    # 잘린 전경 바의 목적지 너비 및 중심 위치(왼쪽 정렬 유지)
-    dst_w = src_w * 3
-    dst_h = full_dst_h
-    dst_x = left + (dst_w / 2)
+    HP_bar_down.clip_draw(13, HP_bar_down.h - 15, 342 - 13, 31 - 15, 600, 550, (342 - 13) * 3, (31 - 15) * 3)
 
-    HP_bar_up.clip_draw(x1, HP_bar_up.h - y2, src_w, full_src_h, dst_x, 545, dst_w, dst_h)
+    # 좌/우 반
+    left_src_x = x1
+    left_src_w = full_src_w // 2
+    right_src_x = x1 + left_src_w
+    right_src_w = full_src_w - left_src_w
 
-    game_world.render()
+    # 좌측
+    left_dst_edge = center_x - (full_dst_w / 2)
+    left_half_dst_w = full_dst_w / 2
+
+    # Lucia (왼쪽 반): 오른쪽(중앙) 쪽에서 줄어들도록 그리기
+    try:
+        lucia_hp = max(0, getattr(lucia, 'hp', 0))
+        lucia_max = getattr(lucia, 'max_hp', 100)
+        lucia_frac = float(lucia_hp) / float(lucia_max) if lucia_max > 0 else 0.0
+    except Exception:
+        lucia_frac = 0.0
+
+    lucia_src_w = max(1, int(left_src_w * lucia_frac))
+    lucia_dst_w = lucia_src_w * 3
+    lucia_dst_h = full_dst_h
+
+    lucia_src_x = left_src_x + (left_src_w - lucia_src_w)
+    lucia_dst_center_x = left_dst_edge + left_half_dst_w - (lucia_dst_w / 2)
+    HP_bar_up.clip_draw(int(lucia_src_x), HP_bar_up.h - y2, int(lucia_src_w), full_src_h, lucia_dst_center_x, center_y, lucia_dst_w, lucia_dst_h)
+
+    # Guy (오른쪽 반): 왼쪽(중앙) 쪽에서 줄어들도록 그리기
+    try:
+        guy_hp = max(0, getattr(guy, 'hp', 100))
+        guy_max = getattr(guy, 'max_hp', 100)
+        guy_frac = float(guy_hp) / float(guy_max) if guy_max > 0 else 0.0
+    except Exception:
+        guy_frac = 0.0
+
+    guy_src_w = max(1, int(right_src_w * guy_frac))
+    guy_dst_w = guy_src_w * 3
+    guy_dst_h = full_dst_h
+
+    guy_src_x = right_src_x
+    right_half_left = left_dst_edge + left_half_dst_w
+    guy_dst_center_x = right_half_left + (guy_dst_w / 2)
+    HP_bar_up.clip_draw(int(guy_src_x), HP_bar_up.h - y2, int(guy_src_w), full_src_h, guy_dst_center_x, center_y, guy_dst_w, guy_dst_h)
 
     update_canvas()
 
