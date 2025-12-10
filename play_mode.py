@@ -4,34 +4,40 @@ import game_world
 import game_framework
 from enemy import Guy
 from hitbox import check_collisions
+from typing import Optional
 
-# 모듈 레벨 전역 변수 선언(정적 분석기 경고 제거용)
-lucia = None
-guy = None
-# import title_mode
-# import item_mode
+# 모듈 레벨 전역 변수
+lucia: Optional[Lucia] = None
+guy: Optional[Guy] = None
 
 def handle_events():
-    event_list = get_events()
-    for event in event_list:
+    try:
+        events = get_events()
+    except Exception:
+        return
+
+    for event in events:
         if event.type == SDL_QUIT:
             game_framework.quit()
         # elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
         #     game_framework.change_mode(title_mode)
         # elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
         #     game_framework.push_mode(item_mode)
-
         else:
-            lucia.handle_event(event)
-
+            try:
+                if lucia is not None:
+                    lucia.handle_event(event)
+            except Exception:
+                # 안전하게 무시
+                pass
 
 def init():
     global lucia, guy
 
     lucia = Lucia()
-    guy=Guy()
+    guy = Guy()
     game_world.add_object(lucia, 1)
-    game_world.add_object(guy,1)
+    game_world.add_object(guy, 1)
 
     game_world.add_collision_pair('lucia:guy', lucia, guy)
 
@@ -53,7 +59,7 @@ def update():
     if enemy_hits:
         attack_list.extend(enemy_hits)
 
-    # 충돌 검사 실행 (frame은 Lucia의 frame 사용 — 양쪽이 동일한 프레임 스케일을 써야 정확함)
+    # 충돌 검사 실행 (frame은 Lucia의 frame 사용)
     if attack_list and hurt_list:
         hits = check_collisions(attack_list, hurt_list, frame=int(lucia.frame))
     else:
@@ -66,6 +72,23 @@ def update():
         victim = hurtbox.owner
         attacker = hitbox.owner
         print(f"[COLLISION] {attacker.__class__.__name__}.{getattr(attacker, 'state', '')} -> {victim.__class__.__name__}.{getattr(victim, 'state', '')} dmg={hitbox.damage}")
+
+        # 누가 피해를 입혔는지 기록 (UI에서 방향 기반 감소를 위해 사용)
+        try:
+            victim.last_hurt_by = attacker.__class__.__name__
+            # 공격자 종류에 따라 감소 방향 결정
+            try:
+                if isinstance(attacker, Lucia):
+                    victim.last_hurt_from = 'right'
+                elif isinstance(attacker, Guy):
+                    victim.last_hurt_from = 'left'
+                else:
+                    victim.last_hurt_from = 'left' if getattr(attacker, 'x', 0) < getattr(victim, 'x', 0) else 'right'
+            except Exception:
+                victim.last_hurt_from = None
+        except Exception:
+            pass
+
         # 우선 on_hit 메서드가 있으면 호출 (예: 무적 처리, 특수 반응)
         if hasattr(victim, 'on_hit') and callable(getattr(victim, 'on_hit')):
             try:
@@ -79,27 +102,10 @@ def update():
                     victim.hp -= hitbox.damage
                 except Exception as e:
                     print(f"Error applying damage: {e}")
-        # 누가 피해를 입혔는지 기록 (UI에서 방향 기반 감소를 위해 사용)
-        try:
-            victim.last_hurt_by = attacker.__class__.__name__
-            # 공격자 종류에 따라 감소 방향 결정: Lucia가 공격하면 오른쪽에서 줄어들게, Guy가 공격하면 왼쪽에서 줄어들게
-            try:
-                if isinstance(attacker, Lucia):
-                    victim.last_hurt_from = 'right'
-                elif isinstance(attacker, Guy):
-                    victim.last_hurt_from = 'left'
-                else:
-                    # fallback: 위치 기반 판정
-                    victim.last_hurt_from = 'left' if getattr(attacker, 'x', 0) < getattr(victim, 'x', 0) else 'right'
-            except Exception:
-                victim.last_hurt_from = None
-        except Exception:
-            pass
 
 def draw():
     clear_canvas()
     game_world.render()
-    update_canvas()
 
 def finish():
     game_world.clear()
