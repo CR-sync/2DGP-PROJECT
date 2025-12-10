@@ -71,6 +71,22 @@ def handle_events():
             running = False
         else:
             lucia.handle_event(event)
+            # 테스트용 바로 데미지 적용: 1 키 -> 적(Guy) 히트, 2 키 -> Lucia 히트
+            try:
+                if event.type == SDL_KEYDOWN and getattr(event, 'key', None) == SDLK_1:
+                    print('[DEBUG] Test: apply 10 dmg to Guy')
+                    try:
+                        guy.on_hit(10)
+                    except Exception as e:
+                        print(f'[DEBUG] guy.on_hit exception: {e}')
+                elif event.type == SDL_KEYDOWN and getattr(event, 'key', None) == SDLK_2:
+                    print('[DEBUG] Test: apply 10 dmg to Lucia')
+                    try:
+                        lucia.on_hit(10)
+                    except Exception as e:
+                        print(f'[DEBUG] lucia.on_hit exception: {e}')
+            except Exception:
+                pass
 
 play_mode.init()
 lucia = play_mode.lucia
